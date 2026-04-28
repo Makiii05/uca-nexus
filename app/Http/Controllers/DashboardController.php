@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\AcademicYear;
 use App\Models\Student;
 use App\Models\Applicant;
 use App\Models\Admission;
@@ -11,24 +12,19 @@ use App\Models\Admission;
 class DashboardController extends Controller
 {
     /**
-     * Hardcoded academic year options.
+     * Academic year options from the database.
      */
-    public static function getAcademicYearOptions(): array
+    public static function getAcademicYearOptions()
     {
-        return [
-            '2024 - 2025',
-            '2025 - 2026',
-            '2026 - 2027',
-            '2027 - 2028',
-            '2028 - 2029',
-            '2029 - 2030',
-        ];
+        return AcademicYear::orderByDesc('start_year')
+            ->orderByDesc('id')
+            ->get();
     }
 
     public function admissionDashboard(Request $request)
     {
         $academicYears = self::getAcademicYearOptions();
-        $selectedYear = $request->query('academic_year', '2025 - 2026');
+        $selectedYear = $request->query('academic_year', $academicYears->first()?->label ?? '');
 
         // Base query: applicants filtered by academic year with their admissions
         $applicantsForYear = Applicant::where('academic_year', $selectedYear);

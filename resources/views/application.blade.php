@@ -44,7 +44,7 @@
                         <div class="form-control col-span-4">
                             <label class="label"><span class="label-text text-gray-700 font-medium">Application No.</span></label>
                             <input type="text" readonly id="application_no" name="application_no" class="input input-bordered w-full bg-white font-mono font-bold text-green-600" placeholder="Auto-generated" value="" required>
-                            <input type="hidden" name="academic_year" value="2025 - 2026">
+                            <input type="hidden" name="academic_year" value="{{ $currentAcademicYear ?? '' }}">
                         </div>
                         <div class="form-control col-span-3">
                             <label class="label"><span class="label-text text-gray-700 font-medium">Level</span></label>

@@ -11,7 +11,7 @@ class AcademicTerm extends Model
         "description",
         "type",
         "department_id",
-        "academic_year",
+        "academic_year_id",
         "start_date",
         "end_date",
         "status",
@@ -25,5 +25,10 @@ class AcademicTerm extends Model
     public function department()
     {
         return $this->belongsTo(Department::class);
+    }
+
+    public function academicYear()
+    {
+        return $this->belongsTo(AcademicYear::class);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\AcademicYear;
 use App\Models\AcademicTerm;
 use App\Models\Department;
 
@@ -12,9 +13,13 @@ class AcademicTermController extends Controller
     {
         $academicTerms = AcademicTerm::orderBy("created_at", "asc")->get();
         $departments = Department::orderBy("created_at", "asc")->get();
+        $academicYears = AcademicYear::orderByDesc('start_year')
+            ->orderByDesc('id')
+            ->get();
         return view('registrar.academic_term', [
             'academicTerms' => $academicTerms,
-            'departments' => $departments
+            'departments' => $departments,
+            'academicYears' => $academicYears,
         ]);
     }
 
@@ -25,7 +30,7 @@ class AcademicTermController extends Controller
             'description' => 'required|string|max:255',
             'type' => 'required|in:semester,full year',
             'department' => 'required|integer|exists:departments,id',
-            'academic_year' => 'required|string|max:255',
+            'academic_year_id' => 'required|integer|exists:academic_years,id',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
             'status' => 'required|in:active,inactive',
@@ -36,7 +41,7 @@ class AcademicTermController extends Controller
             'description' => $request->description,
             'type' => $request->type,
             'department_id' => $request->department,
-            'academic_year' => $request->academic_year,
+            'academic_year_id' => $request->academic_year_id,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
             'status' => $request->status,
@@ -54,7 +59,7 @@ class AcademicTermController extends Controller
             'description' => 'required|string|max:255',
             'type' => 'required|in:semester,full year',
             'department' => 'required|integer|exists:departments,id',
-            'academic_year' => 'required|string|max:255',
+            'academic_year_id' => 'required|integer|exists:academic_years,id',
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
             'status' => 'required|in:active,inactive',
@@ -65,7 +70,7 @@ class AcademicTermController extends Controller
             'description' => $request->description,
             'type' => $request->type,
             'department_id' => $request->department,
-            'academic_year' => $request->academic_year,
+            'academic_year_id' => $request->academic_year_id,
             'start_date' => $request->start_date,
             'end_date' => $request->end_date,
             'status' => $request->status,

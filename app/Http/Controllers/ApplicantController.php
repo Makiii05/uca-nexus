@@ -8,6 +8,7 @@ use App\Models\Program;
 use App\Models\Applicant;
 use App\Models\Schedule;
 use App\Models\Admission;
+use App\Models\AcademicYear;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmailController;
 use Carbon\Carbon;
@@ -23,11 +24,15 @@ class ApplicantController extends Controller
         $college_programs = Program::whereHas('department', function($query){
             $query->where('description', 'like', '%College%');
         })->get();
+        $currentAcademicYear = AcademicYear::orderByDesc('start_year')
+            ->orderByDesc('id')
+            ->first()?->label;
 
         return view('application', [
             'levels' => $levels,
             'strands' => $strands,
             'college_programs' => $college_programs,
+            'currentAcademicYear' => $currentAcademicYear,
         ]);
     }
     
@@ -112,7 +117,7 @@ class ApplicantController extends Controller
 
     public function showApplicant(Request $request){
         $academicYears = DashboardController::getAcademicYearOptions();
-        $selectedYear = $request->query('academic_year', '2025 - 2026');
+        $selectedYear = $request->query('academic_year', $academicYears->first()?->label ?? '');
         $search = $request->query('search', '');
         $sortColumn = $request->query('sort', 'created_at');
         $sortDirection = $request->query('direction', 'desc');
@@ -180,7 +185,8 @@ class ApplicantController extends Controller
     public function searchApplicants(Request $request)
     {
         $search = $request->query('search', '');
-        $academicYear = $request->query('academic_year', '2025 - 2026');
+        $academicYears = DashboardController::getAcademicYearOptions();
+        $academicYear = $request->query('academic_year', $academicYears->first()?->label ?? '');
         $sortColumn = $request->query('sort', 'created_at');
         $sortDirection = $request->query('direction', 'desc');
         $page = $request->query('page', 1);

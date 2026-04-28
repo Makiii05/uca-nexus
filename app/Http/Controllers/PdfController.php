@@ -19,6 +19,7 @@ use App\Models\AssessmentHistoryFee;
 use App\Models\AssessmentHistoryStudent;
 use App\Models\Transaction;
 use App\Models\Fee;
+use App\Http\Controllers\DashboardController;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\DB;
 
@@ -26,7 +27,8 @@ class PdfController extends Controller
 {
     public function printAdmissionStats(Request $request)
     {
-        $selectedYear = $request->query('academic_year', '2025 - 2026');
+        $academicYears = DashboardController::getAcademicYearOptions();
+        $selectedYear = $request->query('academic_year', $academicYears->first()?->label ?? '');
 
         // Group by applicants.level (e.g. "College", "Senior High", "Junior High", etc.)
         $levelStats = Applicant::select(

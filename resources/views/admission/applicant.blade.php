@@ -15,7 +15,7 @@
             <select name="academic_year" id="academic_year_filter" onchange="this.form.submit()"
                 class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-main-primary focus:border-main-primary">
                 @foreach($academicYears as $year)
-                    <option value="{{ $year }}" {{ $selectedYear === $year ? 'selected' : '' }}>{{ $year }}</option>
+                    <option value="{{ $year->label }}" {{ $selectedYear === $year->label ? 'selected' : '' }}>{{ $year->label }}</option>
                 @endforeach
             </select>
         </form>
@@ -61,7 +61,7 @@
                 <option value="markForEvaluation">Mark For Evaluation</option>
             </select>
             <div class="relative">
-                <select name="schedule_id" id="scheduleSelect" class="select select-bordered min-w-[250px]" required>
+                <select name="schedule_id" id="scheduleSelect" class="select select-bordered min-w-62.5" required>
                     <option value="">Select Schedule</option>
                 </select>
                 <div id="scheduleLoading" class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 rounded-lg opacity-0 pointer-events-none transition-opacity duration-200">

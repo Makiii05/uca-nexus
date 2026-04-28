@@ -57,7 +57,12 @@
                     <label class="label">
                         <span class="label-text">Academic Year</span>
                     </label>
-                    <input type="text" name="academic_year" class="input input-bordered w-full" placeholder="Enter academic year" required>
+                    <select name="academic_year_id" class="select select-bordered w-full" required>
+                        <option value="">Select Academic Year</option>
+                        @foreach ($academicYears as $academicYear)
+                        <option value="{{ $academicYear->id }}">{{ $academicYear->label }}</option>
+                        @endforeach
+                    </select>
                 </div>
 
                 <div class="form-control">
@@ -118,12 +123,12 @@
                     <td>{{$academicTerm->description ?? 'N/A'}}</td>
                     <td>{{$academicTerm->type}}</td>
                     <td>{{$academicTerm->department->code ?? 'N/A'}}</td>
-                    <td>{{$academicTerm->academic_year ?? 'N/A'}}</td>
+                    <td>{{$academicTerm->academicYear?->label ?? 'N/A'}}</td>
                     <td>{{$academicTerm->start_date}}</td>
                     <td>{{$academicTerm->end_date}}</td>
                     <td>{{$academicTerm->status}}</td>
                     <td>
-                        <button class="text-green-600 hover:underline" onclick="editAcademicTerm({{ $academicTerm->id }}, '{{ $academicTerm->code }}', '{{ $academicTerm->description }}', '{{ $academicTerm->type }}', {{ $academicTerm->department_id }}, '{{ $academicTerm->academic_year }}', '{{ $academicTerm->start_date }}', '{{ $academicTerm->end_date }}', '{{ $academicTerm->status }}')">edit</button>
+                        <button class="text-green-600 hover:underline" onclick="editAcademicTerm({{ $academicTerm->id }}, '{{ $academicTerm->code }}', '{{ $academicTerm->description }}', '{{ $academicTerm->type }}', {{ $academicTerm->department_id }}, {{ $academicTerm->academic_year_id }}, '{{ $academicTerm->start_date }}', '{{ $academicTerm->end_date }}', '{{ $academicTerm->status }}')">edit</button>
                         <form action="{{ route('registrar.academic_term.delete', $academicTerm->id) }}" method="POST" style="display:inline;" onsubmit="return confirmDelete(this, 'Are you sure you want to delete this academic term?')">
                             @csrf
                             <button type="submit" class="text-red-600 hover:underline">delete</button>
@@ -140,7 +145,7 @@
     @include('partials.delete-confirm-modal')
     
     <script>
-        function editAcademicTerm(id, code, description, type, departmentId, academicYear, startDate, endDate, status) {
+        function editAcademicTerm(id, code, description, type, departmentId, academicYearId, startDate, endDate, status) {
             document.getElementById('form_modal').innerHTML = `
                 <div class="modal-box w-11/12 max-w-5xl">
                     <form method="dialog">
@@ -189,7 +194,12 @@
                             <label class="label">
                                 <span class="label-text">Academic Year</span>
                             </label>
-                            <input type="text" name="academic_year" class="input input-bordered w-full" value="${academicYear}" required>
+                            <select name="academic_year_id" class="select select-bordered w-full" required>
+                                <option value="">Select Academic Year</option>
+                                @foreach ($academicYears as $academicYear)
+                                <option value="{{ $academicYear->id }}" ${academicYearId === {{ $academicYear->id }} ? 'selected' : ''}>{{ $academicYear->label }}</option>
+                                @endforeach
+                            </select>
                         </div>
 
                         <div class="form-control">

@@ -16,6 +16,8 @@ return new class extends Migration
             $table->id();
             $table->enum('enrollment_status', ['open', 'close'])->default('close');
             $table->enum('student_portal_status', ['on', 'off'])->default('off');
+            $table->enum('visible_grade', ['on', 'off'])->default('off');
+            $table->enum('submission_of_grade', ['on', 'off'])->default('off');
             $table->timestamps();
         });
 
@@ -23,6 +25,8 @@ return new class extends Migration
         DB::table('statuses')->insert([
             'enrollment_status' => 'close',
             'student_portal_status' => 'off',
+            'visible_grade' => 'off',
+            'submission_of_grade' => 'off',
             'created_at' => now(),
             'updated_at' => now(),
         ]);

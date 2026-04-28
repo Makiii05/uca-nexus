@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('departments', function (Blueprint $table) {
+        Schema::create('teacher_accounts', function (Blueprint $table) {
             $table->id(); // Primary key
             $table->timestamps();
-            $table->text('code');
-            $table->text('description');
-            $table->enum('education_level', ['K12', 'college'])->default('college')->nullable();
-            $table->string('status')->enum(['active', 'inactive'], "active");
+            $table->foreignId('teacher_id')->nullable()->constrained('teachers')->nullOnDelete();
+            $table->string('password');
+            $table->string('status')->enum(['on', 'off'], "off");
         });
     }
 
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('teacher_accounts');
     }
 };

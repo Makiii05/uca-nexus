@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('description');
             $table->string('type')->default('semester'); // 'semester' or 'full year'
             $table->foreignId('department_id')->nullable()->constrained('departments')->onDelete('cascade');
-            $table->text('academic_year');
+            $table->foreignId('academic_year_id')->constrained('academic_years')->onDelete('cascade');
             $table->date('start_date');
             $table->date('end_date');
             $table->string('status')->enum(['active', 'inactive'], "active");

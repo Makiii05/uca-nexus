@@ -14,7 +14,7 @@
                     <select name="academic_year" id="academic_year" onchange="this.form.submit()"
                         class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-main-primary focus:border-main-primary">
                         @foreach($academicYears as $year)
-                            <option value="{{ $year }}" {{ $selectedYear === $year ? 'selected' : '' }}>{{ $year }}</option>
+                            <option value="{{ $year->label }}" {{ $selectedYear === $year->label ? 'selected' : '' }}>{{ $year->label }}</option>
                         @endforeach
                     </select>
                 </form>

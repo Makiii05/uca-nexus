@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('departments', function (Blueprint $table) {
+        Schema::create('academic_years', function (Blueprint $table) {
             $table->id(); // Primary key
             $table->timestamps();
             $table->text('code');
             $table->text('description');
-            $table->enum('education_level', ['K12', 'college'])->default('college')->nullable();
-            $table->string('status')->enum(['active', 'inactive'], "active");
+            $table->text('start_year');
+            $table->text('end_year');
+            $table->enum('status', ['active', 'inactive'])->default('active');
         });
     }
 
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('academic_years');
     }
 };

@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('departments', function (Blueprint $table) {
+        Schema::create('raw_scores', function (Blueprint $table) {
             $table->id(); // Primary key
             $table->timestamps();
-            $table->text('code');
-            $table->text('description');
-            $table->enum('education_level', ['K12', 'college'])->default('college')->nullable();
-            $table->string('status')->enum(['active', 'inactive'], "active");
+            $table->foreignId('student_id')->nullable()->constrained('students')->nullOnDelete();
+            $table->foreignId('column_id')->nullable()->constrained('grade_columns')->nullOnDelete();
+            $table->decimal('score', 7, 2)->nullable();
         });
     }
 

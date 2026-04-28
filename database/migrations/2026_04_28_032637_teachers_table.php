@@ -11,19 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('subjects', function (Blueprint $table) {
+        Schema::create('teachers', function (Blueprint $table) {
             $table->id(); // Primary key
             $table->timestamps();
             $table->text('code');
-            $table->text('description');
-            $table->integer('unit');
-            $table->integer('lech');
-            $table->integer('lecu');
-            $table->integer('labh');
-            $table->integer('labu');
-            $table->string('type')->enum(['lab', 'lec', 'lec lab'], null);
-            $table->enum('education_level', ['K12', 'college'])->default('college')->nullable();
-            $table->string('weight_category')->nullable();
+            $table->text('first_name');
+            $table->text('middle_name')->nullable();
+            $table->text('last_name');
+            $table->string("email")->unique();
             $table->string('status')->enum(['active', 'inactive'], "active");
         });
     }

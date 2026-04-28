@@ -17,6 +17,7 @@ return new class extends Migration
             $table->text('code');
             $table->text('description');
             $table->string('status')->enum(['active', 'inactive'], "active");
+            $table->string('enrollment_type')->enum(['yearly', 'semester'], "yearly");
             $table->foreignId('department_id')->constrained('departments')->onDelete('cascade');
         });
     }
