@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/x-icon">
+    <title>{{ strtoupper(env('APP_NAME')) }} - Subject Offerings</title>
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 10mm;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'DejaVu Sans', Arial, sans-serif;
+            font-size: 10px;
+            line-height: 1.3;
+            padding: 15px;
+        }
+        .print-date {
+            font-size: 9px;
+            margin-bottom: 8px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .header img {
+            width: 50px;
+            height: 50px;
+        }
+        .header h1 {
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 3px;
+            text-transform: uppercase;
+        }
+        .header p {
+            font-size: 9px;
+        }
+        .title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 11px;
+            padding: 4px 0;
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+            margin-bottom: 10px;
+        }
+        .filter-info {
+            font-size: 9px;
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9px;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 4px 6px;
+            text-align: left;
+        }
+        th {
+            font-weight: bold;
+            font-size: 8px;
+            text-transform: uppercase;
+            background-color: #f0f0f0;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .text-red {
+            color: #dc2626;
+            font-weight: bold;
+        }
+        .text-green {
+            color: #16a34a;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 9px;
+            border-top: 1px solid #000;
+            padding-top: 8px;
+        }
+        .summary {
+            margin-top: 10px;
+            font-size: 9px;
+        }
+    </style>
+</head>
+<body>
+    <p class="print-date">Printed: {{ date('F d, Y') }}</p>
+    
+    <div class="header">
+        <img src="{{ public_path('images/logo.png') }}" alt="Logo">
+        <h1>{{ strtoupper(env('APP_NAME')) }}</h1>
+        <p>School Address</p>
+        <p>000-0000-000 | example@example.com</p>
+    </div>
+    
+    <div class="title">SUBJECT OFFERINGS LIST</div>
+    
+    <div class="filter-info">
+        <strong>Academic Term:</strong> {{ $academicTerm->description }} &nbsp; | &nbsp;
+        <strong>Department:</strong> {{ $department->code }} - {{ $department->description }}
+    </div>
+    
+    <table>
+        <thead>
+            <tr>
+                <th class="text-center">#</th>
+                <th>Code</th>
+                <th>Description</th>
+                <th class="text-center">Units</th>
+                <th class="text-center">Class Size</th>
+                <th class="text-center">Enrolled</th>
+                <th class="text-center">Available</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($subjectOfferings as $index => $offering)
+            @php
+                $enrolled = $offering->enlistments_count;
+                $available = $offering->class_size - $enrolled;
+            @endphp
+            <tr>
+                <td class="text-center">{{ $index + 1 }}</td>
+                <td>{{ $offering->code }}</td>
+                <td>{{ $offering->description }}</td>
+                <td class="text-center">{{ $offering->subject->unit ?? '-' }}</td>
+                <td class="text-center">{{ $offering->class_size }}</td>
+                <td class="text-center">{{ $enrolled }}</td>
+                <td class="text-center {{ $available <= 0 ? 'text-red' : 'text-green' }}">{{ $available }}</td>
+            </tr>
+            @empty
+            <tr>
+                <td colspan="7" style="text-align: center;">No subject offerings found</td>
+            </tr>
+            @endforelse
+        </tbody>
+    </table>
+
+    <div class="summary">
+        <strong>Total Offerings:</strong> {{ $subjectOfferings->count() }} &nbsp; | &nbsp;
+        <strong>Total Enrolled:</strong> {{ $subjectOfferings->sum('enlistments_count') }} &nbsp; | &nbsp;
+        <strong>Total Available Slots:</strong> {{ $subjectOfferings->sum(fn($o) => $o->class_size - $o->enlistments_count) }}
+    </div>
+    
+    <div class="footer">
+        <p>This report was automatically generated by the Enrollment System.</p>
+        <p>&copy; {{ date('Y') }} All Rights Reserved</p>
+    </div>
+</body>
+</html>

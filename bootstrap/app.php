@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -11,8 +12,53 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        // Register custom middleware aliases
+        $middleware->alias([
+            'student.portal.auth' => \App\Http\Middleware\StudentPortalAuth::class,
+        ]);
+
+        $middleware->redirectGuestsTo(function (Request $request) {
+            // Check if the request is for accounting routes
+            if ($request->is('accounting/*')) {
+                return route('accounting.login');
+            }
+            // Check if the request is for registrar routes
+            if ($request->is('registrar/*')) {
+                return route('registrar.login');
+            }
+            // Check if the request is for admission routes
+            if ($request->is('admission/*')) {
+                return route('admission.login');
+            }
+            // Check if the request is for department routes
+            if ($request->is('department/*')) {
+                return route('department.login');
+            }
+            // Check if the request is for admin routes
+            if ($request->is('admin/*')) {
+                return route('admin.login');
+            }
+            // Check if the request is for student portal routes
+            if ($request->is('student-portal/*')) {
+                return route('student_portal.login');
+            }
+            // Default redirect
+            return route('index');
+        });
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Handle 419 Page Expired (CSRF token mismatch)
+        $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, Request $request) {
+            // Redirect back to the previous page or login with a message
+            $referer = $request->headers->get('referer');
+            
+            if ($referer) {
+                return redirect($referer)
+                    ->withInput($request->except('password', '_token'))
+                    ->withErrors(['session' => 'Your session has expired. Please try again.']);
+            }
+            
+            return redirect()->route('index')
+                ->withErrors(['session' => 'Your session has expired. Please try again.']);
+        });
     })->create();

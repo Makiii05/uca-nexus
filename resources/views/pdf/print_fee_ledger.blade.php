@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="icon" href="{{ asset('images/logo.png') }}" type="image/x-icon">
+    <title>Fee Ledger - {{ $fee->description }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+            margin: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 18px;
+        }
+        .header h2 {
+            margin: 5px 0;
+            font-size: 14px;
+            font-weight: normal;
+        }
+        .info {
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #ddd;
+        }
+        .info p {
+            margin: 3px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #333;
+            padding: 6px 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        .text-end {
+            text-align: right;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .total-row {
+            font-weight: bold;
+            background-color: #e8f5e9;
+        }
+        .grand-total {
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: right;
+            font-size: 10px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-bottom: 10px;">
+            <img src="{{ public_path('images/logo.png') }}" alt="Logo" style="height: 50px;">
+        </div>
+        <h1>{{ env('APP_NAME') }}</h1>
+        <h2>Fee Ledger Report</h2>
+    </div>
+
+    <div class="info">
+        <p><strong>Academic Term:</strong> {{ $fee->academicTerm->description ?? 'N/A' }}</p>
+        <p><strong>Fee Description:</strong> 
+            @if($isUnitFee)
+                {{ $fee->description }} ({{ number_format($fee->amount, 2) }} per unit)
+            @else
+                {{ $fee->description }}
+            @endif
+        </p>
+        <p><strong>Fee Type:</strong> {{ ucfirst($fee->group) }} {{ $fee->type ? '- ' . $fee->type : '' }}</p>
+        <p><strong>Program:</strong> {{ $fee->program->description ?? 'N/A' }}</p>
+        <p><strong>{{ $isUnitFee ? 'Rate per Unit:' : 'Amount per Student:' }}</strong> ₱{{ number_format($fee->amount, 2) }}</p>
+        <p><strong>Generated:</strong> {{ now()->format('F j, Y h:i A') }}</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th class="text-center" style="width: 30px;">#</th>
+                <th style="width: 100px;">Student No.</th>
+                <th>Student Name</th>
+                <th style="width: 80px;">Program</th>
+                <th style="width: 100px;">Level</th>
+                @if($isUnitFee)
+                <th class="text-center" style="width: 50px;">Units</th>
+                @endif
+                <th class="text-end" style="width: 100px;">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($studentFees as $index => $studentFee)
+                <tr>
+                    <td class="text-center">{{ $index + 1 }}</td>
+                    <td>{{ $studentFee->student->student_number ?? 'N/A' }}</td>
+                    <td>{{ $studentFee->student->last_name ?? '' }}, {{ $studentFee->student->first_name ?? '' }} {{ $studentFee->student->middle_name ?? '' }}</td>
+                    <td>{{ $studentFee->student->program->code ?? 'N/A' }}</td>
+                    <td>{{ $studentFee->student->level->description ?? 'N/A' }}</td>
+                    @if($isUnitFee)
+                    <td class="text-center">{{ $studentFee->total_units ?? 0 }}</td>
+                    @endif
+                    <td class="text-end">₱{{ number_format($studentFee->calculated_amount, 2) }}</td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="{{ $isUnitFee ? 7 : 6 }}" class="text-center" style="padding: 20px; color: #666;">No students have this fee assigned.</td>
+                </tr>
+            @endforelse
+        </tbody>
+        @if($studentFees->count() > 0)
+        <tfoot>
+            <tr class="total-row">
+                <td colspan="{{ $isUnitFee ? 6 : 5 }}" class="text-end grand-total">Grand Total ({{ $studentFees->count() }} students)</td>
+                <td class="text-end grand-total">₱{{ number_format($grandTotal, 2) }}</td>
+            </tr>
+        </tfoot>
+        @endif
+    </table>
+
+    <div class="footer">
+        <p>Generated by {{ env('APP_NAME') }} - {{ now()->format('F j, Y h:i A') }}</p>
+    </div>
+</body>
+</html>
