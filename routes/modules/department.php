@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\DepartmentAuthController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectOfferingController;
+use App\Http\Controllers\TeacherOfferingController;
 use App\Http\Controllers\EnlistmentController;
 use App\Http\Controllers\PdfController;
 
@@ -49,5 +50,10 @@ Route::prefix('department')->name('department.')->group(function () {
         Route::get('/api/subject-offering/{academicTermId}/{departmentId}', [SubjectOfferingController::class, 'getSubjectOffering'])->name('api.subject_offering');
         Route::get('/api/subjects/search', [SubjectOfferingController::class, 'searchSubjects'])->name('api.subjects.search');
         Route::get('/api/levels-by-program/{programId}', [SubjectOfferingController::class, 'getLevelsByProgram'])->name('api.levels.by-program');
+
+        // Teacher Loading
+        Route::get('/teacher-loading', [TeacherOfferingController::class, 'showTeacherLoading'])->name('teacher_loading');
+        Route::post('/teacher-loading/assign', [TeacherOfferingController::class, 'createTeacherOffering'])->name('teacher_loading.assign');
+        Route::get('/teacher-loading/teachers/{teacherId}/subjects', [TeacherOfferingController::class, 'showTeacherSubjects'])->name('teacher_loading.subjects');
     });
 });

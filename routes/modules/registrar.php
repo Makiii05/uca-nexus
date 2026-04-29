@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\RegistrarAuthController;
 use App\Http\Controllers\AcademicTermController;
 use App\Http\Controllers\AcademicYearController;
 use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\RegistrarStudentController;
 use App\Http\Controllers\ClassListController;
@@ -65,6 +66,11 @@ Route::prefix('registrar')->name('registrar.')->group(function () {
         Route::post('/levels', [LevelController::class, 'createLevel'])->name('level.create');
         Route::post('/levels/{id}/update', [LevelController::class, 'updateLevel'])->name('level.update');
         Route::post('/levels/{id}/delete', [LevelController::class, 'deleteLevel'])->name('level.delete');
+
+        Route::get('/teachers', [TeacherController::class, 'showTeacher'])->name('teacher');
+        Route::post('/teachers', [TeacherController::class, 'createTeacher'])->name('teacher.create');
+        Route::post('/teachers/{id}/update', [TeacherController::class, 'updateTeacher'])->name('teacher.update');
+        Route::post('/teachers/{id}/delete', [TeacherController::class, 'deleteTeacher'])->name('teacher.delete');
 
         Route::get('/prospectuses', [ProspectusController::class, 'showProspectus'])->name('prospectus');
         Route::match(['get', 'post'], '/prospectuses/search', [ProspectusController::class, 'searchProspectus'])->name('prospectus.search');

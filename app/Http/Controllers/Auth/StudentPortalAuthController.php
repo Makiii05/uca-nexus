@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Student;
 use App\Models\StudentAccount;
 use App\Models\AcademicTerm;
+use App\Models\Enlistment;
 use App\Models\Status;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -112,6 +113,106 @@ class StudentPortalAuthController extends Controller
         return view('student_portal.dashboard', compact('student'));
     }
 
+    public function showSubjects(Request $request)
+    {
+        $student = $this->getLoggedInStudent();
+        if (!$student) {
+            return redirect()->route('student_portal.login');
+        }
+
+        $academicTermIds = Enlistment::query()
+            ->where('student_id', $student->id)
+            ->select('academic_term_id')
+            ->distinct()
+            ->pluck('academic_term_id');
+
+        $academicTerms = AcademicTerm::query()
+            ->whereIn('academic_terms.id', $academicTermIds)
+            ->leftJoin('academic_years', 'academic_terms.academic_year_id', '=', 'academic_years.id')
+            ->orderByDesc('academic_years.start_year')
+            ->orderByDesc('academic_years.end_year')
+            ->orderByDesc('academic_terms.start_date')
+            ->select('academic_terms.*')
+            ->get();
+
+        $academicTermId = $request->query('academic_term_id');
+        $academicTerm = null;
+        if ($academicTermId) {
+            $academicTerm = $academicTerms->firstWhere('id', (int) $academicTermId);
+        }
+
+        $enlistments = collect();
+        if ($academicTerm) {
+            $enlistments = Enlistment::query()
+                ->where('student_id', $student->id)
+                ->where('academic_term_id', $academicTerm->id)
+                ->with([
+                    'subjectOffering.subject',
+                    'subjectOffering.program',
+                    'subjectOffering.level',
+                ])
+                ->orderBy('created_at')
+                ->get();
+        }
+
+        return view('student_portal.subjects', [
+            'student' => $student,
+            'academicTerms' => $academicTerms,
+            'academicTerm' => $academicTerm,
+            'enlistments' => $enlistments,
+        ]);
+    }
+
+    public function showGrades(Request $request)
+    {
+        $student = $this->getLoggedInStudent();
+        if (!$student) {
+            return redirect()->route('student_portal.login');
+        }
+
+        $academicTermIds = Enlistment::query()
+            ->where('student_id', $student->id)
+            ->select('academic_term_id')
+            ->distinct()
+            ->pluck('academic_term_id');
+
+        $academicTerms = AcademicTerm::query()
+            ->whereIn('academic_terms.id', $academicTermIds)
+            ->leftJoin('academic_years', 'academic_terms.academic_year_id', '=', 'academic_years.id')
+            ->orderByDesc('academic_years.start_year')
+            ->orderByDesc('academic_years.end_year')
+            ->orderByDesc('academic_terms.start_date')
+            ->select('academic_terms.*')
+            ->get();
+
+        $academicTermId = $request->query('academic_term_id');
+        $academicTerm = null;
+        if ($academicTermId) {
+            $academicTerm = $academicTerms->firstWhere('id', (int) $academicTermId);
+        }
+
+        $enlistments = collect();
+        if ($academicTerm) {
+            $enlistments = Enlistment::query()
+                ->where('student_id', $student->id)
+                ->where('academic_term_id', $academicTerm->id)
+                ->with([
+                    'subjectOffering.subject',
+                    'subjectOffering.program',
+                    'subjectOffering.level',
+                ])
+                ->orderBy('created_at')
+                ->get();
+        }
+
+        return view('student_portal.grades', [
+            'student' => $student,
+            'academicTerms' => $academicTerms,
+            'academicTerm' => $academicTerm,
+            'enlistments' => $enlistments,
+        ]);
+    }
+
     public function showLedger()
     {
         $student = $this->getLoggedInStudent();
@@ -120,9 +221,14 @@ class StudentPortalAuthController extends Controller
         }
         
         // Get active academic terms for the student's department
-        $academicTerms = AcademicTerm::where('department_id', $student->department_id)
-            ->where('status', 'active')
-            ->orderBy('academic_year', 'desc')
+        $academicTerms = AcademicTerm::query()
+            ->where('academic_terms.department_id', $student->department_id)
+            ->where('academic_terms.status', 'active')
+            ->leftJoin('academic_years', 'academic_terms.academic_year_id', '=', 'academic_years.id')
+            ->orderByDesc('academic_years.start_year')
+            ->orderByDesc('academic_years.end_year')
+            ->orderByDesc('academic_terms.start_date')
+            ->select('academic_terms.*')
             ->get();
         
         return view('student_portal.ledger', compact('student', 'academicTerms'));
