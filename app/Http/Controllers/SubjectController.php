@@ -19,12 +19,14 @@ class SubjectController extends Controller
         $request->validate([
             'code' => 'required|string|max:255|unique:subjects',
             'description' => 'required|string|max:255',
-            'unit' => 'required|numeric|min:0',
-            'lech' => 'required|numeric|min:0',
-            'lecu' => 'required|numeric|min:0',
-            'labh' => 'required|numeric|min:0',
-            'labu' => 'required|numeric|min:0',
+            'unit' => 'required|integer|min:0',
+            'lech' => 'required|integer|min:0',
+            'lecu' => 'required|integer|min:0',
+            'labh' => 'required|integer|min:0',
+            'labu' => 'required|integer|min:0',
             'type' => 'required|in:lec,lab,lec lab',
+            'education_level' => 'nullable|in:K12,college',
+            'weight_category' => 'nullable|string|max:255',
             'status' => 'required|in:active,inactive',
         ]);
 
@@ -37,6 +39,8 @@ class SubjectController extends Controller
             'labh' => $request->labh,
             'labu' => $request->labu,
             'type' => $request->type,
+            'education_level' => $request->education_level,
+            'weight_category' => $request->weight_category,
             'status' => $request->status,
         ]);
 
@@ -49,12 +53,14 @@ class SubjectController extends Controller
         $request->validate([
             'code' => 'required|string|max:255|unique:subjects,code,'.$id,
             'description' => 'required|string|max:255',
-            'unit' => 'required|numeric|min:0',
-            'lech' => 'required|numeric|min:0',
-            'lecu' => 'required|numeric|min:0',
-            'labh' => 'required|numeric|min:0',
-            'labu' => 'required|numeric|min:0',
+            'unit' => 'required|integer|min:0',
+            'lech' => 'required|integer|min:0',
+            'lecu' => 'required|integer|min:0',
+            'labh' => 'required|integer|min:0',
+            'labu' => 'required|integer|min:0',
             'type' => 'required|in:lec,lab,lec lab',
+            'education_level' => 'nullable|in:K12,college',
+            'weight_category' => 'nullable|string|max:255',
             'status' => 'required|in:active,inactive',
         ]);
 
@@ -67,6 +73,8 @@ class SubjectController extends Controller
             'labh' => $request->labh,
             'labu' => $request->labu,
             'type' => $request->type,
+            'education_level' => $request->education_level,
+            'weight_category' => $request->weight_category,
             'status' => $request->status,
         ]);
 

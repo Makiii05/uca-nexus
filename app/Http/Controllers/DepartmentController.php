@@ -19,12 +19,14 @@ class DepartmentController extends Controller
         $request->validate([
             'code' => 'required|string|max:255|unique:departments',
             'description' => 'required|string|max:255',
+            'education_level' => 'nullable|in:K12,college',
             'status' => 'required|in:active,inactive',
         ]);
 
         Department::create([
             'code' => $request->code,
             'description' => $request->description,
+            'education_level' => $request->education_level,
             'status' => $request->status,
         ]);
 
@@ -37,12 +39,14 @@ class DepartmentController extends Controller
         $request->validate([
             'code' => 'required|string|max:255|unique:departments,code,'.$id,
             'description' => 'required|string|max:255',
+            'education_level' => 'nullable|in:K12,college',
             'status' => 'required|in:active,inactive',
         ]);
 
         $department->update([
             'code' => $request->code,
             'description' => $request->description,
+            'education_level' => $request->education_level,
             'status' => $request->status,
         ]);
 

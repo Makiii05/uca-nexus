@@ -28,7 +28,8 @@ class PdfController extends Controller
     public function printAdmissionStats(Request $request)
     {
         $academicYears = DashboardController::getAcademicYearOptions();
-        $selectedYear = $request->query('academic_year', $academicYears->first()?->label ?? '');
+        $defaultYear = \App\Models\AcademicYear::getActiveYearLabel() ?? $academicYears->first()?->label ?? '';
+        $selectedYear = $request->query('academic_year', $defaultYear);
 
         // Group by applicants.level (e.g. "College", "Senior High", "Junior High", etc.)
         $levelStats = Applicant::select(

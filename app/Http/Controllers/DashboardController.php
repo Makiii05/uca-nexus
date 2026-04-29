@@ -24,7 +24,8 @@ class DashboardController extends Controller
     public function admissionDashboard(Request $request)
     {
         $academicYears = self::getAcademicYearOptions();
-        $selectedYear = $request->query('academic_year', $academicYears->first()?->label ?? '');
+        $defaultYear = AcademicYear::getActiveYearLabel() ?? $academicYears->first()?->label ?? '';
+        $selectedYear = $request->query('academic_year', $defaultYear);
 
         // Base query: applicants filtered by academic year with their admissions
         $applicantsForYear = Applicant::where('academic_year', $selectedYear);

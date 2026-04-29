@@ -8,6 +8,7 @@ use App\Models\Curriculum;
 use App\Models\Subject;
 use App\Models\Level;
 use App\Models\Department;
+use App\Models\AcademicTerm;
 
 class ProspectusController extends Controller
 {
@@ -24,6 +25,7 @@ class ProspectusController extends Controller
         return $request->validate([
             'curriculum' => 'required|exists:curricula,id',
             'level' => 'required|exists:levels,id',
+            'term' => 'required|exists:academic_terms,id',
             'subject' => 'required|exists:subjects,id',
             'status' => 'required|in:active,inactive',
         ]);
@@ -52,8 +54,7 @@ class ProspectusController extends Controller
             ->whereHas('curriculum', function ($query) use ($department) {
                 $query->where('department_id', $department);
             })
-            ->with(['curriculum.department', 'level.program', 'subject'])
-            ->orderBy("created_at", "asc")
+            ->with(['curriculum.department', 'level.program', 'term', 'subject'])
             ->get();
         $curricula = Curriculum::where('status', 'active')->orderBy("created_at", "asc")->get();
         $subjects = Subject::where('status', 'active')->orderBy("created_at", "asc")->get();
@@ -75,11 +76,12 @@ class ProspectusController extends Controller
         $prospectus = Prospectus::create([
             'curriculum_id' => $validated['curriculum'],
             'level_id' => $validated['level'],
+            'term_id' => $validated['term'],
             'subject_id' => $validated['subject'],
             'status' => $validated['status'],
         ]);
 
-        $prospectus->load(['curriculum.department', 'level.program', 'subject']);
+        $prospectus->load(['curriculum.department', 'level.program', 'term', 'subject']);
 
         return response()->json([
             'success' => true,
@@ -96,11 +98,12 @@ class ProspectusController extends Controller
         $prospectus->update([
             'curriculum_id' => $validated['curriculum'],
             'level_id' => $validated['level'],
+            'term_id' => $validated['term'],
             'subject_id' => $validated['subject'],
             'status' => $validated['status'],
         ]);
 
-        $prospectus->load(['curriculum.department', 'level.program', 'subject']);
+        $prospectus->load(['curriculum.department', 'level.program', 'term', 'subject']);
 
         return response()->json([
             'success' => true,
@@ -141,6 +144,16 @@ class ProspectusController extends Controller
         return response()->json($curricula);
     }
 
+    public function getTermsByDepartment($departmentId)
+    {
+        $terms = AcademicTerm::where('department_id', $departmentId)
+            ->where('status', 'active')
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        return response()->json($terms);
+    }
+
     public function getProspectusesApi(Request $request)
     {
         $validated = $this->validateSearchRequest($request);
@@ -153,16 +166,33 @@ class ProspectusController extends Controller
             ->whereHas('curriculum', function ($query) use ($department) {
                 $query->where('department_id', $department);
             })
-            ->with(['curriculum.department', 'level.program', 'subject'])
-            ->orderBy("created_at", "asc")
+            ->with(['curriculum.department', 'level.program', 'term', 'subject'])
             ->get();
 
-        $grouped = $prospectuses->groupBy('level_id')->map(function ($levelGroup) {
-            return [
-                'level' => $levelGroup->first()->level,
-                'prospectuses' => $levelGroup->values()
-            ];
-        })->values();
+        $grouped = $prospectuses
+            // should be order by code of the program. But since the relationship is through level, we will order by program code in the collection after loading the relationship.
+            ->sortBy(function ($prospectus) {
+                return $prospectus->level->program->code;
+            })
+            ->groupBy('level_id')
+            ->map(function ($levelGroup) {
+                $terms = $levelGroup
+                    ->sortBy('term.description')
+                    ->groupBy('term_id')
+                    ->map(function ($termGroup) {
+                        return [
+                            'term' => $termGroup->first()->term,
+                            'prospectuses' => $termGroup->sortBy('subject.description')->values(),
+                        ];
+                    })
+                    ->values();
+
+                return [
+                    'level' => $levelGroup->first()->level,
+                    'terms' => $terms,
+                ];
+            })
+            ->values();
 
         return response()->json([
             'success' => true,

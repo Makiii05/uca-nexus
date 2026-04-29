@@ -8,6 +8,7 @@ use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\ProspectusController;
 use App\Http\Controllers\Auth\RegistrarAuthController;
 use App\Http\Controllers\AcademicTermController;
+use App\Http\Controllers\AcademicYearController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\RegistrarStudentController;
@@ -50,6 +51,11 @@ Route::prefix('registrar')->name('registrar.')->group(function () {
         Route::post('/academic-terms/{id}/update', [AcademicTermController::class, 'updateAcademicTerm'])->name('academic_term.update');
         Route::post('/academic-terms/{id}/delete', [AcademicTermController::class, 'deleteAcademicTerm'])->name('academic_term.delete');
 
+        Route::get('/academic-years', [AcademicYearController::class, 'showAcademicYear'])->name('academic_year');
+        Route::post('/academic-years', [AcademicYearController::class, 'createAcademicYear'])->name('academic_year.create');
+        Route::post('/academic-years/{id}/update', [AcademicYearController::class, 'updateAcademicYear'])->name('academic_year.update');
+        Route::post('/academic-years/{id}/delete', [AcademicYearController::class, 'deleteAcademicYear'])->name('academic_year.delete');
+
         Route::get('/subjects', [SubjectController::class, 'showSubject'])->name('subject');
         Route::post('/subjects', [SubjectController::class, 'createSubject'])->name('subject.create');
         Route::post('/subjects/{id}/update', [SubjectController::class, 'updateSubject'])->name('subject.update');
@@ -85,6 +91,7 @@ Route::prefix('registrar')->name('registrar.')->group(function () {
 
         Route::get('/api/levels-by-department/{departmentId}', [ProspectusController::class, 'getLevelsByDepartment'])->name('api.levels');
         Route::get('/api/curricula-by-department/{departmentId}', [ProspectusController::class, 'getCurriculaByDepartment'])->name('api.curricula');
+        Route::get('/api/terms-by-department/{departmentId}', [ProspectusController::class, 'getTermsByDepartment'])->name('api.terms');
         Route::get('/api/prospectuses', [ProspectusController::class, 'getProspectusesApi'])->name('api.prospectuses');
 
         // Class List routes

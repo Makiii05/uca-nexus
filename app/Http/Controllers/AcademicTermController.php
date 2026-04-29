@@ -55,7 +55,7 @@ class AcademicTermController extends Controller
         $academicTerm = AcademicTerm::findOrFail($id);
 
         $request->validate([
-            'code' => 'required|string|max:255|unique:academic_terms,code,' . $id,
+            'code' => 'required|string|max:255' . $id,
             'description' => 'required|string|max:255',
             'type' => 'required|in:semester,full year',
             'department' => 'required|integer|exists:departments,id',

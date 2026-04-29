@@ -44,6 +44,16 @@
 
                 <div class="form-control">
                     <label class="label">
+                        <span class="label-text">Enrollment Type</span>
+                    </label>
+                    <select name="enrollment_type" class="select select-bordered w-full">
+                        <option value="yearly">Yearly</option>
+                        <option value="semester">Semester</option>
+                    </select>
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
                         <span class="label-text">Status</span>
                     </label>
                     <select name="status" class="select select-bordered w-full">
@@ -70,6 +80,7 @@
                     <th>Code</th>
                     <th>Description</th>
                     <th>Department</th>
+                    <th>Enrollment Type</th>
                     <th>Status</th>
                     <th data-no-sort></th>
                 </tr>
@@ -81,9 +92,10 @@
                     <td>{{$program->code}}</td>
                     <td>{{$program->description}}</td>
                     <td>{{$program->department->code}}</td>
+                    <td>{{$program->enrollment_type}}</td>
                     <td>{{$program->status}}</td>
                     <td>
-                        <button class="text-green-600 hover:underline" onclick="editProgram({{ $program->id }}, '{{ $program->code }}', '{{ $program->description }}', {{ $program->department_id }}, '{{ $program->status }}')">edit</button>
+                        <button class="text-green-600 hover:underline" onclick="editProgram({{ $program->id }}, '{{ $program->code }}', '{{ $program->description }}', {{ $program->department_id }}, '{{ $program->enrollment_type }}', '{{ $program->status }}')">edit</button>
                         <form action="{{ route('registrar.program.delete', $program->id) }}" method="POST" style="display:inline;" onsubmit="return confirmDelete(this, 'Are you sure you want to delete this program?')">
                             @csrf
                             <button type="submit" class="text-red-600 hover:underline">delete</button>
@@ -100,7 +112,7 @@
     @include('partials.delete-confirm-modal')
     
     <script>
-        function editProgram(id, code, description, departmentId, status) {
+        function editProgram(id, code, description, departmentId, enrollmentType, status) {
             let deptOptions = `
                 @foreach ($departments as $department)
                 <option value="{{ $department->id }}" ${departmentId === {{ $department->id }} ? 'selected' : ''}>{{ $department->code }} - {{ $department->description }}</option>
@@ -136,6 +148,16 @@
                             </label>
                             <select name="department" class="select select-bordered w-full">
                                 ${deptOptions}
+                            </select>
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">Enrollment Type</span>
+                            </label>
+                            <select name="enrollment_type" class="select select-bordered w-full">
+                                <option value="yearly" ${enrollmentType === 'yearly' ? 'selected' : ''}>Yearly</option>
+                                <option value="semester" ${enrollmentType === 'semester' ? 'selected' : ''}>Semester</option>
                             </select>
                         </div>
 

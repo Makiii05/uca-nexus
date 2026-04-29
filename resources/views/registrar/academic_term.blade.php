@@ -121,7 +121,7 @@
                     <td>{{$academicTerm->id}}</td>
                     <td>{{$academicTerm->code}}</td>
                     <td>{{$academicTerm->description ?? 'N/A'}}</td>
-                    <td>{{$academicTerm->type}}</td>
+                    <td>{{ ucfirst($academicTerm->type) }}</td>
                     <td>{{$academicTerm->department->code ?? 'N/A'}}</td>
                     <td>{{$academicTerm->academicYear?->label ?? 'N/A'}}</td>
                     <td>{{$academicTerm->start_date}}</td>

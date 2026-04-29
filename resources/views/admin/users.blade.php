@@ -24,6 +24,7 @@
                     <th>Email</th>
                     <th>Office</th>
                     <th>Role</th>
+                    <th>Status</th>
                     <th>Created At</th>
                     <th data-no-sort>Actions</th>
                 </tr>
@@ -36,6 +37,7 @@
                     <td>{{ $user->email }}</td>
                     <td>{{ $user->department_id ? ($user->department->code ?? 'Department') : ucfirst($user->type) }}</td>
                     <td>{{ ucfirst($user->role) }}</td>
+                    <td>{{ ucfirst($user->status) }}</td>
                     <td>{{ $user->created_at->format('M d, Y') }}</td>
                     <td>
                         <button 

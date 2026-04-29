@@ -19,7 +19,7 @@ class AcademicTerm extends Model
 
     public function prospectuses()
     {
-        return $this->hasMany(Prospectus::class);
+        return $this->hasMany(Prospectus::class, 'term_id');
     }
 
     public function department()

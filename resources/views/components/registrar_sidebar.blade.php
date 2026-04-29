@@ -91,6 +91,14 @@
                 <span class="is-drawer-close:hidden">Academic Terms</span>
               </a>
             </li>
+            <li>
+              <a href="{{ route('registrar.academic_year') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right" data-tip="Academic Years">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 8.25h18M6 3.75h12M6 3.75v16.5M18 3.75v16.5M4.5 20.25h15" />
+                </svg>
+                <span class="is-drawer-close:hidden">Academic Years</span>
+              </a>
+            </li>
             <!-- List item -->
             <li>
               <a href="{{ route('registrar.subject') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right" data-tip="Subjects">

@@ -35,14 +35,14 @@
                     <label class="label">
                         <span class="label-text">Unit</span>
                     </label>
-                    <input type="number" step="0.01" name="unit" class="input input-bordered w-full" placeholder="Enter subject unit" required>
+                    <input type="number" step="1" name="unit" class="input input-bordered w-full" placeholder="Enter subject unit" required>
                 </div>
 
                 <div class="form-control">
                     <label class="label">
                         <span class="label-text">Lecture Hour</span>
                     </label>
-                    <input type="number" step="0.01" name="lech" class="input input-bordered w-full" placeholder="Enter lecture hour" required>
+                    <input type="number" step="1" name="lech" class="input input-bordered w-full" placeholder="Enter lecture hour" required>
                 </div>
 
 
@@ -50,7 +50,7 @@
                     <label class="label">
                         <span class="label-text">Lecture Unit</span>
                     </label>
-                    <input type="number" step="0.01" name="lecu" class="input input-bordered w-full" placeholder="Enter lecture unit" required>
+                    <input type="number" step="1" name="lecu" class="input input-bordered w-full" placeholder="Enter lecture unit" required>
                 </div>
 
 
@@ -58,7 +58,7 @@
                     <label class="label">
                         <span class="label-text">Laboratory Hour</span>
                     </label>
-                    <input type="number" step="0.01" name="labh" class="input input-bordered w-full" placeholder="Enter laboratory hour" required>
+                    <input type="number" step="1" name="labh" class="input input-bordered w-full" placeholder="Enter laboratory hour" required>
                 </div>
 
 
@@ -66,7 +66,7 @@
                     <label class="label">
                         <span class="label-text">Laboratory Unit</span>
                     </label>
-                    <input type="number" step="0.01" name="labu" class="input input-bordered w-full" placeholder="Enter laboratory unit" required>
+                    <input type="number" step="1" name="labu" class="input input-bordered w-full" placeholder="Enter laboratory unit" required>
                 </div>
 
                 <div class="form-control col-span-2">
@@ -78,6 +78,24 @@
                         <option value="lab">Laboratory</option>
                         <option value="lec lab">Lecture and Laboratory</option>
                     </select>
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Education Level</span>
+                    </label>
+                    <select name="education_level" class="select select-bordered w-full">
+                        <option value="">Select education level</option>
+                        <option value="K12">K12</option>
+                        <option value="college" selected>College</option>
+                    </select>
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Weight Category</span>
+                    </label>
+                    <input type="text" name="weight_category" class="input input-bordered w-full" placeholder="Enter weight category (optional)">
                 </div>
                 
                 <div class="form-control col-span-2">
@@ -113,6 +131,8 @@
                     <th>Lab H</th>
                     <th>Lab U</th>
                     <th>Type</th>
+                    <th>Education Level</th>
+                    <th>Weight Category</th>
                     <th>Status</th>
                     <th data-no-sort></th>
                 </tr>
@@ -129,9 +149,11 @@
                     <td>{{$subject->labh}}</td>
                     <td>{{$subject->labu}}</td>
                     <td>{{$subject->type}}</td>
+                    <td>{{$subject->education_level ?? 'N/A'}}</td>
+                    <td>{{$subject->weight_category ?? 'N/A'}}</td>
                     <td>{{$subject->status}}</td>
                     <td>
-                        <button class="text-green-600 hover:underline" onclick="editSubject({{ $subject->id }}, '{{ $subject->code }}', '{{ $subject->description }}', {{ $subject->unit }}, {{ $subject->lech }}, {{ $subject->lecu }}, {{ $subject->labh }}, {{ $subject->labu }}, '{{ $subject->type }}', '{{ $subject->status }}')">edit</button>
+                        <button class="text-green-600 hover:underline" onclick="editSubject({{ $subject->id }}, '{{ $subject->code }}', '{{ $subject->description }}', {{ $subject->unit }}, {{ $subject->lech }}, {{ $subject->lecu }}, {{ $subject->labh }}, {{ $subject->labu }}, '{{ $subject->type }}', '{{ $subject->education_level }}', '{{ $subject->weight_category }}', '{{ $subject->status }}')">edit</button>
                         <form action="{{ route('registrar.subject.delete', $subject->id) }}" method="POST" style="display:inline;" onsubmit="return confirmDelete(this, 'Are you sure you want to delete this subject?')">
                             @csrf
                             <button type="submit" class="text-red-600 hover:underline">delete</button>
@@ -148,7 +170,7 @@
     @include('partials.delete-confirm-modal')
     
     <script>
-        function editSubject(id, code, description, unit, lech, lecu, labh, labu, type, status) {
+        function editSubject(id, code, description, unit, lech, lecu, labh, labu, type, educationLevel, weightCategory, status) {
             document.getElementById('form_modal').innerHTML = `
                 <div class="modal-box w-11/12 max-w-5xl">
                     <form method="dialog">
@@ -176,35 +198,35 @@
                             <label class="label">
                                 <span class="label-text">Unit</span>
                             </label>
-                            <input type="number" step="0.01" name="unit" class="input input-bordered w-full" value="${unit}" required>
+                            <input type="number" step="1" name="unit" class="input input-bordered w-full" value="${unit}" required>
                         </div>
 
                         <div class="form-control">
                             <label class="label">
                                 <span class="label-text">Lecture Hour</span>
                             </label>
-                            <input type="number" step="0.01" name="lech" class="input input-bordered w-full" value="${lech}" required>
+                            <input type="number" step="1" name="lech" class="input input-bordered w-full" value="${lech}" required>
                         </div>
 
                         <div class="form-control">
                             <label class="label">
                                 <span class="label-text">Lecture Unit</span>
                             </label>
-                            <input type="number" step="0.01" name="lecu" class="input input-bordered w-full" value="${lecu}" required>
+                            <input type="number" step="1" name="lecu" class="input input-bordered w-full" value="${lecu}" required>
                         </div>
 
                         <div class="form-control">
                             <label class="label">
                                 <span class="label-text">Laboratory Hour</span>
                             </label>
-                            <input type="number" step="0.01" name="labh" class="input input-bordered w-full" value="${labh}" required>
+                            <input type="number" step="1" name="labh" class="input input-bordered w-full" value="${labh}" required>
                         </div>
 
                         <div class="form-control">
                             <label class="label">
                                 <span class="label-text">Laboratory Unit</span>
                             </label>
-                            <input type="number" step="0.01" name="labu" class="input input-bordered w-full" value="${labu}" required>
+                            <input type="number" step="1" name="labu" class="input input-bordered w-full" value="${labu}" required>
                         </div>
 
                         <div class="form-control col-span-2">
@@ -216,6 +238,24 @@
                                 <option value="lab" ${type === 'lab' ? 'selected' : ''}>Laboratory</option>
                                 <option value="lec lab" ${type === 'lec lab' ? 'selected' : ''}>Lecture and Laboratory</option>
                             </select>
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">Education Level</span>
+                            </label>
+                            <select name="education_level" class="select select-bordered w-full">
+                                <option value="" ${!educationLevel ? 'selected' : ''}>Select education level</option>
+                                <option value="K12" ${educationLevel === 'K12' ? 'selected' : ''}>K12</option>
+                                <option value="college" ${educationLevel === 'college' ? 'selected' : ''}>College</option>
+                            </select>
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">Weight Category</span>
+                            </label>
+                            <input type="text" name="weight_category" class="input input-bordered w-full" value="${weightCategory || ''}" placeholder="Enter weight category (optional)">
                         </div>
                         
                         <div class="form-control col-span-2">

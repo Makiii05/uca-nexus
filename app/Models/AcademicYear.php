@@ -35,4 +35,18 @@ class AcademicYear extends Model
 
         return trim((string) $this->code);
     }
+
+    public static function getActiveYear(): ?self
+    {
+        return self::query()
+            ->where('status', 'active')
+            ->orderByDesc('start_year')
+            ->orderByDesc('id')
+            ->first();
+    }
+
+    public static function getActiveYearLabel(): ?string
+    {
+        return self::getActiveYear()?->label;
+    }
 }

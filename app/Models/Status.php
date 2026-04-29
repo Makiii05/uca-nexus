@@ -9,6 +9,8 @@ class Status extends Model
     protected $fillable = [
         'enrollment_status',
         'student_portal_status',
+        'visible_grade',
+        'submission_of_grade',
     ];
 
     /**

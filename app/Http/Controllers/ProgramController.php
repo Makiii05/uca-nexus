@@ -23,6 +23,7 @@ class ProgramController extends Controller
             'code' => 'required|string|max:255|unique:programs',
             'description' => 'required|string|max:255',
             'department' => 'required|integer|exists:departments,id',
+            'enrollment_type' => 'required|in:yearly,semester',
             'status' => 'required|in:active,inactive',
         ]);
 
@@ -30,6 +31,7 @@ class ProgramController extends Controller
             'code' => $request->code,
             'description' => $request->description,
             'department_id' => $request->department,
+            'enrollment_type' => $request->enrollment_type,
             'status' => $request->status,
         ]);
 
@@ -43,6 +45,7 @@ class ProgramController extends Controller
             'code' => 'required|string|max:255|unique:programs,code,'.$id,
             'description' => 'required|string|max:255',
             'department' => 'required|integer|exists:departments,id',
+            'enrollment_type' => 'required|in:yearly,semester',
             'status' => 'required|in:active,inactive',
         ]);
 
@@ -50,6 +53,7 @@ class ProgramController extends Controller
             'code' => $request->code,
             'description' => $request->description,
             'department_id' => $request->department,
+            'enrollment_type' => $request->enrollment_type,
             'status' => $request->status,
         ]);
 

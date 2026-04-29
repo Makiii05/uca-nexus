@@ -1,48 +1,51 @@
 <x-registrar_sidebar>
 
     <div class="m-4 font-bold text-4xl">
-        <h2>Department</h2>
+        <h2>Academic Year</h2>
     </div>
 
     @include('partials.notifications')
     <div class="m-4 grid">
-        <button class="btn w-auto justify-self-end bg-white shadow" onclick="form_modal.showModal()">Add Department</button>
+        <button class="btn w-auto justify-self-end bg-white shadow" onclick="form_modal.showModal()">Add Academic Year</button>
     </div>
     <dialog id="form_modal" class="modal">
         <div class="modal-box w-11/12 max-w-5xl">
             <form method="dialog">
                 <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
             </form>
-            <h3 class="text-lg font-bold mb-4">Add Department</h3>
-            <form action="{{ route('registrar.department.create') }}" method="POST" class="space-y-4">
+            <h3 class="text-lg font-bold mb-4">Add Academic Year</h3>
+            <form action="{{ route('registrar.academic_year.create') }}" method="POST" class="space-y-4 space-x-4 grid grid-cols-2">
                 @csrf
-                
+
                 <div class="form-control">
                     <label class="label">
                         <span class="label-text">Code</span>
                     </label>
-                    <input type="text" name="code" class="input input-bordered w-full" placeholder="Enter department code" required>
+                    <input type="text" name="code" class="input input-bordered w-full" placeholder="Enter academic year code" required>
                 </div>
 
                 <div class="form-control">
                     <label class="label">
                         <span class="label-text">Description</span>
                     </label>
-                    <input type="text" name="description" class="input input-bordered w-full" placeholder="Enter department description" required>
+                    <input type="text" name="description" class="input input-bordered w-full" placeholder="Enter academic year description" required>
                 </div>
 
                 <div class="form-control">
                     <label class="label">
-                        <span class="label-text">Education Level</span>
+                        <span class="label-text">Start Year</span>
                     </label>
-                    <select name="education_level" class="select select-bordered w-full">
-                        <option value="">Select education level</option>
-                        <option value="K12">K12</option>
-                        <option value="college">College</option>
-                    </select>
+                    <input type="text" name="start_year" class="input input-bordered w-full" placeholder="Enter start year" required>
                 </div>
 
                 <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">End Year</span>
+                    </label>
+                    <input type="text" name="end_year" class="input input-bordered w-full" placeholder="Enter end year" required>
+                </div>
+
+                <div class="form-control col-span-2">
                     <label class="label">
                         <span class="label-text">Status</span>
                     </label>
@@ -52,9 +55,9 @@
                     </select>
                 </div>
 
-                <div class="modal-action">
+                <div class="modal-action col-span-2">
                     <button type="button" class="btn" onclick="form_modal.close()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Department</button>
+                    <button type="submit" class="btn btn-primary">Save Academic Year</button>
                 </div>
             </form>
         </div>
@@ -69,22 +72,24 @@
                     <th></th>
                     <th>Code</th>
                     <th>Description</th>
-                    <th>Education Level</th>
+                    <th>Start Year</th>
+                    <th>End Year</th>
                     <th>Status</th>
                     <th data-no-sort></th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($departments as $department)
+                @foreach ($academicYears as $academicYear)
                 <tr>
-                    <td>{{$department->id}}</td>
-                    <td>{{$department->code}}</td>
-                    <td>{{$department->description}}</td>
-                    <td>{{$department->education_level ?? 'N/A'}}</td>
-                    <td>{{$department->status}}</td>
+                    <td>{{$academicYear->id}}</td>
+                    <td>{{$academicYear->code}}</td>
+                    <td>{{$academicYear->description}}</td>
+                    <td>{{$academicYear->start_year}}</td>
+                    <td>{{$academicYear->end_year}}</td>
+                    <td>{{$academicYear->status}}</td>
                     <td>
-                        <button class="text-green-600 hover:underline" onclick="editDepartment({{ $department->id }}, '{{ $department->code }}', '{{ $department->description }}', '{{ $department->education_level }}', '{{ $department->status }}')">edit</button>
-                        <form action="{{ route('registrar.department.delete', $department->id) }}" method="POST" style="display:inline;" onsubmit="return confirmDelete(this, 'Are you sure you want to delete this department?')">
+                        <button class="text-green-600 hover:underline" onclick="editAcademicYear({{ $academicYear->id }}, '{{ $academicYear->code }}', '{{ $academicYear->description }}', '{{ $academicYear->start_year }}', '{{ $academicYear->end_year }}', '{{ $academicYear->status }}')">edit</button>
+                        <form action="{{ route('registrar.academic_year.delete', $academicYear->id) }}" method="POST" style="display:inline;" onsubmit="return confirmDelete(this, 'Are you sure you want to delete this academic year?')">
                             @csrf
                             <button type="submit" class="text-red-600 hover:underline">delete</button>
                         </form>
@@ -98,18 +103,18 @@
 
     @include('partials.table-sort-search')
     @include('partials.delete-confirm-modal')
-    
+
     <script>
-        function editDepartment(id, code, description, educationLevel, status) {
+        function editAcademicYear(id, code, description, startYear, endYear, status) {
             document.getElementById('form_modal').innerHTML = `
                 <div class="modal-box w-11/12 max-w-5xl">
                     <form method="dialog">
                         <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                     </form>
-                    <h3 class="text-lg font-bold mb-4">Edit Department</h3>
-                    <form action="/registrar/departments/${id}/update" method="POST" class="space-y-4">
+                    <h3 class="text-lg font-bold mb-4">Edit Academic Year</h3>
+                    <form action="/registrar/academic-years/${id}/update" method="POST" class="space-y-4 space-x-4 grid grid-cols-2">
                         @csrf
-                        
+
                         <div class="form-control">
                             <label class="label">
                                 <span class="label-text">Code</span>
@@ -126,16 +131,19 @@
 
                         <div class="form-control">
                             <label class="label">
-                                <span class="label-text">Education Level</span>
+                                <span class="label-text">Start Year</span>
                             </label>
-                            <select name="education_level" class="select select-bordered w-full">
-                                <option value="" ${!educationLevel ? 'selected' : ''}>Select education level</option>
-                                <option value="K12" ${educationLevel === 'K12' ? 'selected' : ''}>K12</option>
-                                <option value="college" ${educationLevel === 'college' ? 'selected' : ''}>College</option>
-                            </select>
+                            <input type="text" name="start_year" class="input input-bordered w-full" value="${startYear}" required>
                         </div>
 
                         <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">End Year</span>
+                            </label>
+                            <input type="text" name="end_year" class="input input-bordered w-full" value="${endYear}" required>
+                        </div>
+
+                        <div class="form-control col-span-2">
                             <label class="label">
                                 <span class="label-text">Status</span>
                             </label>
@@ -145,9 +153,9 @@
                             </select>
                         </div>
 
-                        <div class="modal-action">
+                        <div class="modal-action col-span-2">
                             <button type="button" class="btn" onclick="form_modal.close()">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Update Department</button>
+                            <button type="submit" class="btn btn-primary">Update Academic Year</button>
                         </div>
                     </form>
                 </div>

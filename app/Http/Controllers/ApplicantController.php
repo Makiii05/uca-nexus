@@ -24,9 +24,8 @@ class ApplicantController extends Controller
         $college_programs = Program::whereHas('department', function($query){
             $query->where('description', 'like', '%College%');
         })->get();
-        $currentAcademicYear = AcademicYear::orderByDesc('start_year')
-            ->orderByDesc('id')
-            ->first()?->label;
+        $currentAcademicYear = AcademicYear::getActiveYearLabel()
+            ?? AcademicYear::orderByDesc('start_year')->orderByDesc('id')->first()?->label;
 
         return view('application', [
             'levels' => $levels,
@@ -89,18 +88,30 @@ class ApplicantController extends Controller
             "college_inclusive_years" => "required",
             "lrn" => "required|integer",
         ]);
+
+        $academicYearLabel = AcademicYear::getActiveYearLabel()
+            ?? AcademicYear::orderByDesc('start_year')->orderByDesc('id')->first()?->label;
+
+        if (!$academicYearLabel) {
+            return back()
+                ->withErrors(['academic_year' => 'No active academic year is set. Please contact the registrar.'])
+                ->withInput();
+        }
+
+        $payload = $request->except(['email_confirmation']);
+        $payload['academic_year'] = $academicYearLabel;
         
         // Check if applicant with this email already exists
         $existingApplicant = Applicant::where('email', $validated['email'])->first();
         
         if($existingApplicant){
             // Update existing applicant (keep original application_no)
-            $existingApplicant->update($request->except(['email_confirmation']));
+            $existingApplicant->update($payload);
             $applicant = $existingApplicant;
             $isNew = false;
         } else {
             // Create new applicant
-            $applicant = Applicant::create($request->except('email_confirmation'));
+            $applicant = Applicant::create($payload);
             $isNew = true;
         }
         
@@ -117,7 +128,8 @@ class ApplicantController extends Controller
 
     public function showApplicant(Request $request){
         $academicYears = DashboardController::getAcademicYearOptions();
-        $selectedYear = $request->query('academic_year', $academicYears->first()?->label ?? '');
+        $defaultYear = AcademicYear::getActiveYearLabel() ?? $academicYears->first()?->label ?? '';
+        $selectedYear = $request->query('academic_year', $defaultYear);
         $search = $request->query('search', '');
         $sortColumn = $request->query('sort', 'created_at');
         $sortDirection = $request->query('direction', 'desc');
@@ -186,7 +198,8 @@ class ApplicantController extends Controller
     {
         $search = $request->query('search', '');
         $academicYears = DashboardController::getAcademicYearOptions();
-        $academicYear = $request->query('academic_year', $academicYears->first()?->label ?? '');
+        $defaultYear = AcademicYear::getActiveYearLabel() ?? $academicYears->first()?->label ?? '';
+        $academicYear = $request->query('academic_year', $defaultYear);
         $sortColumn = $request->query('sort', 'created_at');
         $sortDirection = $request->query('direction', 'desc');
         $page = $request->query('page', 1);

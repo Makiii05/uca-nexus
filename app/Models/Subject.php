@@ -15,6 +15,8 @@ class Subject extends Model
         "lecu",
         "labu",
         "type",
+        "education_level",
+        "weight_category",
         "status",
     ];
 

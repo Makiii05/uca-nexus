@@ -11,6 +11,7 @@ class Program extends Model
         "description",
         "status",
         "department_id",
+        "enrollment_type",
     ];
 
     public function curricula(){

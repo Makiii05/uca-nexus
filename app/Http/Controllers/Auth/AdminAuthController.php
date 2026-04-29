@@ -60,7 +60,7 @@ class AdminAuthController extends Controller
 
     public function showUsers()
     {
-        $users = User::with('department')->orderBy('created_at', 'desc')->get();
+        $users = User::with('department')->orderBy('created_at', 'desc')->where('status', 'active')->get();
         $departments = Department::all();
 
         return view('admin.users', [

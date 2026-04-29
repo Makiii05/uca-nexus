@@ -10,6 +10,7 @@ class Prospectus extends Model
         "curriculum_id",
         "subject_id",
         "level_id",
+        "term_id",
         "status",
     ];
 
@@ -23,5 +24,10 @@ class Prospectus extends Model
 
     public function level(){
         return $this->belongsTo(Level::class);
+    }
+
+    public function term()
+    {
+        return $this->belongsTo(AcademicTerm::class, 'term_id');
     }
 }
