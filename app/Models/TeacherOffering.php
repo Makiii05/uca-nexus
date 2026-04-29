@@ -10,7 +10,7 @@ class TeacherOffering extends Model
     protected $fillable = [
         'teacher_id',
         'offering_id',
-        'academic_year_id',
+        'academic_term_id',
         'status',
     ];
 
@@ -24,8 +24,8 @@ class TeacherOffering extends Model
         return $this->belongsTo(SubjectOffering::class, 'offering_id');
     }
 
-    public function academicYear(): BelongsTo
+    public function academicTerm(): BelongsTo
     {
-        return $this->belongsTo(AcademicYear::class);
+        return $this->belongsTo(AcademicTerm::class);
     }
 }

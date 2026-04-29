@@ -20,6 +20,12 @@ Route::prefix('student-portal')->name('student_portal.')->group(function () {
     Route::middleware(['student.portal.auth'])->group(function () {
         // Dashboard
         Route::get('/dashboard', [StudentPortalAuthController::class, 'showDashboard'])->name('dashboard');
+
+        // Subjects
+        Route::get('/subjects', [StudentPortalAuthController::class, 'showSubjects'])->name('subjects');
+
+        // Grades
+        Route::get('/grades', [StudentPortalAuthController::class, 'showGrades'])->name('grades');
         
         // Ledger
         Route::get('/ledger', [StudentPortalAuthController::class, 'showLedger'])->name('ledger');
