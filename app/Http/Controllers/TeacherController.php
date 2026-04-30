@@ -12,7 +12,8 @@ class TeacherController extends Controller
 {
     public function showTeacher()
     {
-        $teachers = Teacher::orderBy('created_at', 'asc')
+        $teachers = Teacher::with('account')
+            ->orderBy('created_at', 'asc')
             ->orderBy('status', 'asc')
             ->get();
 
@@ -69,5 +70,31 @@ class TeacherController extends Controller
         $teacher->delete();
 
         return redirect()->route('registrar.teacher')->with('success', 'Teacher deleted successfully');
+    }
+
+    public function toggleTeacherAccountStatus($id)
+    {
+        $teacher = Teacher::with('account')->findOrFail($id);
+
+        if (!$teacher->account) {
+            TeacherAccount::create([
+                'teacher_id' => $teacher->id,
+                'password' => Hash::make('123'),
+                'status' => 'on',
+            ]);
+
+            return redirect()
+                ->route('registrar.teacher')
+                ->with('success', 'Teacher portal account opened. Default password is 123.');
+        }
+
+        $newStatus = $teacher->account->status === 'on' ? 'off' : 'on';
+        $teacher->account->update(['status' => $newStatus]);
+
+        $message = $newStatus === 'on'
+            ? 'Teacher portal account opened.'
+            : 'Teacher portal account closed.';
+
+        return redirect()->route('registrar.teacher')->with('success', $message);
     }
 }

@@ -25,6 +25,7 @@
                         <th>Last Name</th>
                         <th>Email</th>
                         <th>Status</th>
+                        <th>Portal Status</th>
                         <th data-no-sort></th>
                     </tr>
                 </thead>
@@ -38,8 +39,19 @@
                             <td>{{ $teacher->last_name }}</td>
                             <td>{{ $teacher->email }}</td>
                             <td>{{ $teacher->status }}</td>
+                            <td>{{ $teacher->account?->status ?? 'off' }}</td>
                             <td>
                                 <button class="text-green-600 hover:underline" onclick='openTeacherEditModal(@json($teacher))'>edit</button>
+
+                                <form action="{{ route('registrar.teacher.toggle-account', $teacher->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to change this teacher\'s portal account status?')">
+                                    @csrf
+                                    @if(($teacher->account?->status ?? 'off') === 'on')
+                                        <button type="submit" class="text-orange-600 hover:underline">close account</button>
+                                    @else
+                                        <button type="submit" class="text-blue-600 hover:underline">open account</button>
+                                    @endif
+                                </form>
+
                                 <form action="{{ route('registrar.teacher.delete', $teacher->id) }}" method="POST" style="display:inline;" onsubmit="return confirmDelete(this, 'Are you sure you want to delete this teacher?')">
                                     @csrf
                                     <button type="submit" class="text-red-600 hover:underline">delete</button>

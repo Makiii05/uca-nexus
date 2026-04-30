@@ -53,3 +53,6 @@ require __DIR__.'/modules/admin.php';
 
 // Student Portal module - student self-service
 require __DIR__.'/modules/student_portal.php';
+
+// Teacher Portal module - teacher self-service
+require __DIR__.'/modules/teacher_portal.php';

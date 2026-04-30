@@ -57,25 +57,37 @@
                             <details class="collapse bg-base-100 border-base-300 border mb-3">
                                 <summary class="collapse-title font-semibold">{{ $level->program->code}} - {{ $level->description }}</summary>
                                 <div class="collapse-content text-sm">
-                                    <table class="table table-zebra">
-                                        <thead>
-                                            <tr>
-                                                <th>Code</th>
-                                                <th>Description</th>
-                                                <th>Unit</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($groupedByLevel as $prospectus)
-                                            <tr class="cursor-pointer hover:bg-blue-50 transition-colors duration-150"
-                                                onclick="addOfferingWithProgramAndLevel({{ $prospectus->subject->id }}, {{ $level->program->id }}, {{ $level->id }})">
-                                                <td>{{ $prospectus->subject->code }}</td>
-                                                <td>{{ $prospectus->subject->description }}</td>
-                                                <td>{{ $prospectus->subject->unit }}</td>
-                                            </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
+                                    @foreach ($groupedByLevel->sortBy('term.description')->groupBy('term_id') as $termId => $groupedByTerm)
+                                    @php
+                                        $term = $groupedByTerm->first()->term;
+                                    @endphp
+                                    <details class="collapse bg-base-100 border-base-300 border mb-3">
+                                        <summary class="collapse-title font-semibold">
+                                            {{ $term?->description ?? 'No Academic Term' }}
+                                        </summary>
+                                        <div class="collapse-content text-sm">
+                                            <table class="table table-zebra">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Code</th>
+                                                        <th>Description</th>
+                                                        <th>Unit</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($groupedByTerm->sortBy('subject.description') as $prospectus)
+                                                    <tr class="cursor-pointer hover:bg-blue-50 transition-colors duration-150"
+                                                        onclick="addOfferingWithProgramAndLevel({{ $prospectus->subject->id }}, {{ $level->program->id }}, {{ $level->id }})">
+                                                        <td>{{ $prospectus->subject->code }}</td>
+                                                        <td>{{ $prospectus->subject->description }}</td>
+                                                        <td>{{ $prospectus->subject->unit }}</td>
+                                                    </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </details>
+                                    @endforeach
                                 </div>  
                             </details>
                             @endforeach

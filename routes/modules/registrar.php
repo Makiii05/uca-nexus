@@ -70,6 +70,7 @@ Route::prefix('registrar')->name('registrar.')->group(function () {
         Route::get('/teachers', [TeacherController::class, 'showTeacher'])->name('teacher');
         Route::post('/teachers', [TeacherController::class, 'createTeacher'])->name('teacher.create');
         Route::post('/teachers/{id}/update', [TeacherController::class, 'updateTeacher'])->name('teacher.update');
+        Route::post('/teachers/{id}/toggle-account', [TeacherController::class, 'toggleTeacherAccountStatus'])->name('teacher.toggle-account');
         Route::post('/teachers/{id}/delete', [TeacherController::class, 'deleteTeacher'])->name('teacher.delete');
 
         Route::get('/prospectuses', [ProspectusController::class, 'showProspectus'])->name('prospectus');

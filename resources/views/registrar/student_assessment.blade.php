@@ -14,7 +14,7 @@
                 <option value="{{ $term->id }}">{{ $term->description }}</option>
             @endforeach
         </select>
-        <div class="ml-auto">
+        <div id="printAssessmentWrapper" class="ml-auto hidden">
             <a id="printAssessmentLink" href="#" target="_blank" class="btn btn-neutral btn-sm" onclick="return handlePrintClick()">
                 Print Assessment
             </a>
@@ -23,7 +23,7 @@
 
     <div class="flex gap-5">
         <!-- LEFT SECTION: Student Info + Enlistment Table -->
-        <div class="w-1/2 flex flex-col gap-5">
+        <div id="assessmentLeftColumn" class="w-full flex flex-col gap-5">
             <!-- Student Info Box -->
             <div class="bg-white shadow rounded-lg p-6">
                 <h3 class="font-semibold text-lg mb-4">Student Information</h3>
@@ -77,111 +77,113 @@
                 </div>
             </div>
 
-            <!-- Enlistment Table -->
-            <div class="bg-white shadow rounded-lg p-6">
-                <h3 class="font-semibold text-lg mb-4">Enlisted Subjects</h3>
-                <div class="overflow-x-auto">
-                    <table class="table table-zebra">
-                        <thead>
-                            <tr>
-                                <th>Code</th>
-                                <th>Description</th>
-                                <th>Units</th>
-                            </tr>
-                        </thead>
-                        <tbody id="enlistmentTableBody">
-                            <tr>
-                                <td colspan="3" class="text-center text-gray-500 py-8">Select an academic term to view subjects.</td>
-                            </tr>
-                        </tbody>
-                        <tfoot id="enlistmentTableFoot" class="hidden">
-                            <tr>
-                                <td colspan="2" class="text-right font-semibold">Total Units:</td>
-                                <td class="font-semibold" id="totalUnits">0</td>
-                            </tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Fee Tables -->
-            <div id="feeSection" class="flex flex-col gap-5">
-                <!-- Major Fees -->
+            <div id="termDependentLeft" class="hidden flex-col gap-5">
+                <!-- Enlistment Table -->
                 <div class="bg-white shadow rounded-lg p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-semibold text-lg">Major Fees</h3>
-                        <div class="flex gap-2">
-                            <button class="btn btn-primary btn-sm" onclick="openAddNewFeeModal('major')">Add New Fee</button>
-                            <button class="btn btn-outline btn-sm" onclick="openExistingFeesModal('major')">Add Existing Fee</button>
-                        </div>
-                    </div>
+                    <h3 class="font-semibold text-lg mb-4">Enlisted Subjects</h3>
                     <div class="overflow-x-auto">
-                        <table class="table table-zebra table-sm">
+                        <table class="table table-zebra">
                             <thead>
-                                <tr><th>Description</th><th class="text-end">Amount</th><th class="w-20">Actions</th></tr>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Description</th>
+                                    <th>Units</th>
+                                </tr>
                             </thead>
-                            <tbody id="majorFeesBody">
-                                <tr><td colspan="3" class="text-center text-gray-500 py-4">Select an academic term.</td></tr>
+                            <tbody id="enlistmentTableBody">
+                                <tr>
+                                    <td colspan="3" class="text-center text-gray-500 py-8">Select an academic term to view subjects.</td>
+                                </tr>
                             </tbody>
-                            <tfoot id="majorFeesFoot" class="hidden">
-                                <tr><td class="text-end font-semibold">Total</td><td class="text-end font-semibold" id="majorFeesTotal">0</td><td></td></tr>
+                            <tfoot id="enlistmentTableFoot" class="hidden">
+                                <tr>
+                                    <td colspan="2" class="text-right font-semibold">Total Units:</td>
+                                    <td class="font-semibold" id="totalUnits">0</td>
+                                </tr>
                             </tfoot>
                         </table>
                     </div>
                 </div>
 
-                <!-- Other Fees -->
-                <div class="bg-white shadow rounded-lg p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-semibold text-lg">Other Fees</h3>
-                        <div class="flex gap-2">
-                            <button class="btn btn-primary btn-sm" onclick="openAddNewFeeModal('other')">Add New Fee</button>
-                            <button class="btn btn-outline btn-sm" onclick="openExistingFeesModal('other')">Add Existing Fee</button>
+                <!-- Fee Tables -->
+                <div id="feeSection" class="flex flex-col gap-5">
+                    <!-- Major Fees -->
+                    <div class="bg-white shadow rounded-lg p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-semibold text-lg">Major Fees</h3>
+                            <div class="flex gap-2">
+                                <button class="btn btn-primary btn-sm" onclick="openAddNewFeeModal('major')">Add New Fee</button>
+                                <button class="btn btn-outline btn-sm" onclick="openExistingFeesModal('major')">Add Existing Fee</button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="table table-zebra table-sm">
+                                <thead>
+                                    <tr><th>Description</th><th class="text-end">Amount</th><th class="w-20">Actions</th></tr>
+                                </thead>
+                                <tbody id="majorFeesBody">
+                                    <tr><td colspan="3" class="text-center text-gray-500 py-4">Select an academic term.</td></tr>
+                                </tbody>
+                                <tfoot id="majorFeesFoot" class="hidden">
+                                    <tr><td class="text-end font-semibold">Total</td><td class="text-end font-semibold" id="majorFeesTotal">0</td><td></td></tr>
+                                </tfoot>
+                            </table>
                         </div>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="table table-zebra table-sm">
-                            <thead>
-                                <tr><th>Description</th><th class="w-20">Type</th><th class="text-end">Amount</th><th class="w-20">Actions</th></tr>
-                            </thead>
-                            <tbody id="otherFeesBody">
-                                <tr><td colspan="4" class="text-center text-gray-500 py-4">Select an academic term.</td></tr>
-                            </tbody>
-                            <tfoot id="otherFeesFoot" class="hidden">
-                                <tr><td colspan="2" class="text-end font-semibold">Total</td><td class="text-end font-semibold" id="otherFeesTotal">0</td><td></td></tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                </div>
 
-                <!-- Additional Fees -->
-                <div class="bg-white shadow rounded-lg p-6">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-semibold text-lg">Additional Fees</h3>
-                        <div class="flex gap-2">
-                            <button class="btn btn-primary btn-sm" onclick="openAddNewFeeModal('additional')">Add New Fee</button>
-                            <button class="btn btn-outline btn-sm" onclick="openExistingFeesModal('additional')">Add Existing Fee</button>
+                    <!-- Other Fees -->
+                    <div class="bg-white shadow rounded-lg p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-semibold text-lg">Other Fees</h3>
+                            <div class="flex gap-2">
+                                <button class="btn btn-primary btn-sm" onclick="openAddNewFeeModal('other')">Add New Fee</button>
+                                <button class="btn btn-outline btn-sm" onclick="openExistingFeesModal('other')">Add Existing Fee</button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="table table-zebra table-sm">
+                                <thead>
+                                    <tr><th>Description</th><th class="w-20">Type</th><th class="text-end">Amount</th><th class="w-20">Actions</th></tr>
+                                </thead>
+                                <tbody id="otherFeesBody">
+                                    <tr><td colspan="4" class="text-center text-gray-500 py-4">Select an academic term.</td></tr>
+                                </tbody>
+                                <tfoot id="otherFeesFoot" class="hidden">
+                                    <tr><td colspan="2" class="text-end font-semibold">Total</td><td class="text-end font-semibold" id="otherFeesTotal">0</td><td></td></tr>
+                                </tfoot>
+                            </table>
                         </div>
                     </div>
-                    <div class="overflow-x-auto">
-                        <table class="table table-zebra table-sm">
-                            <thead>
-                                <tr><th>Description</th><th class="w-20">Type</th><th class="w-24">Months to Pay</th><th class="text-end">Amount</th><th class="w-20">Actions</th></tr>
-                            </thead>
-                            <tbody id="additionalFeesBody">
-                                <tr><td colspan="5" class="text-center text-gray-500 py-4">Select an academic term.</td></tr>
-                            </tbody>
-                            <tfoot id="additionalFeesFoot" class="hidden">
-                                <tr><td colspan="3" class="text-end font-semibold">Total</td><td class="text-end font-semibold" id="additionalFeesTotal">0</td><td></td></tr>
-                            </tfoot>
-                        </table>
+
+                    <!-- Additional Fees -->
+                    <div class="bg-white shadow rounded-lg p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-semibold text-lg">Additional Fees</h3>
+                            <div class="flex gap-2">
+                                <button class="btn btn-primary btn-sm" onclick="openAddNewFeeModal('additional')">Add New Fee</button>
+                                <button class="btn btn-outline btn-sm" onclick="openExistingFeesModal('additional')">Add Existing Fee</button>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="table table-zebra table-sm">
+                                <thead>
+                                    <tr><th>Description</th><th class="w-20">Type</th><th class="w-24">Months to Pay</th><th class="text-end">Amount</th><th class="w-20">Actions</th></tr>
+                                </thead>
+                                <tbody id="additionalFeesBody">
+                                    <tr><td colspan="5" class="text-center text-gray-500 py-4">Select an academic term.</td></tr>
+                                </tbody>
+                                <tfoot id="additionalFeesFoot" class="hidden">
+                                    <tr><td colspan="3" class="text-end font-semibold">Total</td><td class="text-end font-semibold" id="additionalFeesTotal">0</td><td></td></tr>
+                                </tfoot>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- RIGHT SECTION: Fee Details -->
-        <div class="w-1/2 flex flex-col gap-5">
+        <div id="assessmentRightColumn" class="w-1/2 hidden flex-col gap-5">
             <div class="bg-white shadow rounded-lg p-6" id="feeDetailsSection">
                 <div class="flex gap-6">
                     <!-- Left: Schedule of Fees -->
@@ -333,6 +335,54 @@
             return document.getElementById('academicTermSelect').value;
         }
 
+        function toggleTermDependentUI(academicTermId) {
+            const leftCol = document.getElementById('assessmentLeftColumn');
+            const rightCol = document.getElementById('assessmentRightColumn');
+            const termLeft = document.getElementById('termDependentLeft');
+            const printWrapper = document.getElementById('printAssessmentWrapper');
+
+            if (!academicTermId) {
+                if (termLeft) {
+                    termLeft.classList.add('hidden');
+                    termLeft.classList.remove('flex');
+                }
+
+                if (rightCol) {
+                    rightCol.classList.add('hidden');
+                    rightCol.classList.remove('flex');
+                }
+
+                if (printWrapper) {
+                    printWrapper.classList.add('hidden');
+                }
+
+                if (leftCol) {
+                    leftCol.classList.remove('w-1/2');
+                    leftCol.classList.add('w-full');
+                }
+                return;
+            }
+
+            if (termLeft) {
+                termLeft.classList.remove('hidden');
+                termLeft.classList.add('flex');
+            }
+
+            if (rightCol) {
+                rightCol.classList.remove('hidden');
+                rightCol.classList.add('flex');
+            }
+
+            if (printWrapper) {
+                printWrapper.classList.remove('hidden');
+            }
+
+            if (leftCol) {
+                leftCol.classList.remove('w-full');
+                leftCol.classList.add('w-1/2');
+            }
+        }
+
         // ── Number Formatting ─────────────────────────────────
         function formatMoney(value) {
             return Number(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -352,19 +402,27 @@
             return true;
         }
 
-        // ── Enlistments ──────────────────────────────────────
+        // ── Enlistments / Fees / History (term-dependent UI) ───────────────
         document.getElementById('academicTermSelect').addEventListener('change', function () {
             const termId = this.value;
+            toggleTermDependentUI(termId);
+
+            if (!termId) return;
+
             loadEnlistments(termId);
             loadStudentFees(termId);
+            loadAssessmentHistories();
         });
 
         document.addEventListener('DOMContentLoaded', function () {
             const select = document.getElementById('academicTermSelect');
-            if (select.value) {
-                loadEnlistments(select.value);
-                loadStudentFees(select.value);
-            }
+            toggleTermDependentUI(select.value);
+
+            if (!select.value) return;
+
+            loadEnlistments(select.value);
+            loadStudentFees(select.value);
+            loadAssessmentHistories();
         });
 
         async function loadEnlistments(academicTermId) {
@@ -852,10 +910,6 @@
             }
         }
 
-        // Load assessment histories on page load
-        document.addEventListener('DOMContentLoaded', function () {
-            loadAssessmentHistories();
-        });
     </script>
 
 </x-registrar_sidebar>

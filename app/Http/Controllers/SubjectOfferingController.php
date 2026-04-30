@@ -66,7 +66,7 @@ class SubjectOfferingController extends Controller
             ->whereHas('curriculum', function ($query) use ($selectedDepartment) {
                 $query->where('department_id', $selectedDepartment);
             })
-            ->with(['curriculum.department', 'level.program', 'subject'])
+            ->with(['curriculum.department', 'level.program', 'subject', 'term'])
             ->orderBy('created_at', 'asc')
             ->get();
 

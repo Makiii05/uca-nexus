@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Register custom middleware aliases
         $middleware->alias([
             'student.portal.auth' => \App\Http\Middleware\StudentPortalAuth::class,
+            'teacher.portal.auth' => \App\Http\Middleware\TeacherPortalAuth::class,
         ]);
 
         $middleware->redirectGuestsTo(function (Request $request) {
@@ -41,6 +42,10 @@ return Application::configure(basePath: dirname(__DIR__))
             // Check if the request is for student portal routes
             if ($request->is('student-portal/*')) {
                 return route('student_portal.login');
+            }
+            // Check if the request is for teacher portal routes
+            if ($request->is('teacher-portal/*')) {
+                return route('teacher_portal.login');
             }
             // Default redirect
             return route('index');
