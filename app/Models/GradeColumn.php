@@ -8,39 +8,33 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class GradeColumn extends Model
 {
+    protected $table = 'grade_column';
+
     protected $fillable = [
-        'teacher_id',
-        'offering_id',
-        'academic_term_id',
-        'grading_period',
-        'component_type',
+        'teacher_offering_id',
+        'period',
+        'component_id',
         'column_number',
-        'highest_possible_score',
-        'description',
+        'highest_score',
     ];
 
     protected $casts = [
         'column_number' => 'integer',
-        'highest_possible_score' => 'decimal:2',
+        'highest_score' => 'decimal:2',
     ];
 
-    public function teacher(): BelongsTo
+    public function teacherOffering(): BelongsTo
     {
-        return $this->belongsTo(Teacher::class);
+        return $this->belongsTo(TeacherOffering::class);
     }
 
-    public function offering(): BelongsTo
+    public function component(): BelongsTo
     {
-        return $this->belongsTo(SubjectOffering::class, 'offering_id');
-    }
-
-    public function academicTerm(): BelongsTo
-    {
-        return $this->belongsTo(AcademicTerm::class);
+        return $this->belongsTo(Component::class);
     }
 
     public function rawScores(): HasMany
     {
-        return $this->hasMany(RawScore::class, 'column_id');
+        return $this->hasMany(RawScore::class);
     }
 }

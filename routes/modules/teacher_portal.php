@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\TeacherAuthController;
+use App\Http\Controllers\GradeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,5 +27,13 @@ Route::prefix('teacher-portal')->name('teacher_portal.')->group(function () {
 
         // Input Grade
         Route::get('/input-grade/{teacherOfferingId}', [TeacherAuthController::class, 'showInputGrade'])->name('input_grade');
+
+        // API routes for dynamic loading
+        Route::get('/api/student-grades/{teacherOfferingId}', [TeacherAuthController::class, 'getStudentGrades'])->name('api.student_grades');
+        Route::get('/api/component-columns/{teacherOfferingId}', [TeacherAuthController::class, 'getComponentColumns'])->name('api.component_columns');
+        Route::patch('/api/grade-column/{gradeColumnId}/highest-score', [GradeController::class, 'updateHighestScore'])->name('api.grade_column.highest_score');
+        Route::post('/api/grade-column/{teacherOfferingId}', [GradeController::class, 'storeGradeColumn'])->name('api.grade_column.store');
+        Route::delete('/api/grade-column/{gradeColumnId}', [GradeController::class, 'deleteGradeColumn'])->name('api.grade_column.delete');
+        Route::patch('/api/raw-score/{gradeId}/{gradeColumnId}', [GradeController::class, 'updateRawScore'])->name('api.raw_score.update');
     });
 });

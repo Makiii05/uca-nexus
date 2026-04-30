@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RawScore extends Model
 {
+    protected $table = 'raw_score';
+
     protected $fillable = [
-        'student_id',
-        'column_id',
+        'grade_id',
+        'grade_column_id',
         'score',
     ];
 
@@ -17,13 +19,13 @@ class RawScore extends Model
         'score' => 'decimal:2',
     ];
 
-    public function student(): BelongsTo
+    public function grade(): BelongsTo
     {
-        return $this->belongsTo(Student::class);
+        return $this->belongsTo(Grade::class);
     }
 
     public function gradeColumn(): BelongsTo
     {
-        return $this->belongsTo(GradeColumn::class, 'column_id');
+        return $this->belongsTo(GradeColumn::class);
     }
 }

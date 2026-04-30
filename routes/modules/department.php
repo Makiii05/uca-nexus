@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\DepartmentAuthController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\DepartmentComponentController;
+use App\Http\Controllers\DepartmentGradingSystemController;
 use App\Http\Controllers\SubjectOfferingController;
 use App\Http\Controllers\TeacherOfferingController;
 use App\Http\Controllers\EnlistmentController;
@@ -50,6 +52,19 @@ Route::prefix('department')->name('department.')->group(function () {
         Route::get('/api/subject-offering/{academicTermId}/{departmentId}', [SubjectOfferingController::class, 'getSubjectOffering'])->name('api.subject_offering');
         Route::get('/api/subjects/search', [SubjectOfferingController::class, 'searchSubjects'])->name('api.subjects.search');
         Route::get('/api/levels-by-program/{programId}', [SubjectOfferingController::class, 'getLevelsByProgram'])->name('api.levels.by-program');
+
+        // Grading Components
+        Route::get('/grading-components', [DepartmentComponentController::class, 'index'])->name('grading_components.index');
+        Route::post('/grading-components', [DepartmentComponentController::class, 'store'])->name('grading_components.store');
+        Route::post('/grading-components/{id}/update', [DepartmentComponentController::class, 'update'])->name('grading_components.update');
+        Route::post('/grading-components/{id}/delete', [DepartmentComponentController::class, 'destroy'])->name('grading_components.delete');
+
+        // Grading Systems
+        Route::get('/grading-systems', [DepartmentGradingSystemController::class, 'index'])->name('grading_systems.index');
+        Route::post('/grading-systems', [DepartmentGradingSystemController::class, 'store'])->name('grading_systems.store');
+        Route::post('/grading-systems/{id}/update', [DepartmentGradingSystemController::class, 'update'])->name('grading_systems.update');
+        Route::post('/grading-systems/{id}/delete', [DepartmentGradingSystemController::class, 'destroy'])->name('grading_systems.delete');
+        Route::get('/api/grading-systems-by-department/{departmentId}', [SubjectOfferingController::class, 'getGradingSystemsByDepartment'])->name('api.grading_systems');
 
         // Teacher Loading
         Route::get('/teacher-loading', [TeacherOfferingController::class, 'showTeacherLoading'])->name('teacher_loading');

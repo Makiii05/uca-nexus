@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\AcademicTerm;
 use App\Models\Teacher;
 use App\Models\TeacherAccount;
+use App\Models\Enlistment;
+use App\Models\Grade;
+use App\Models\GradeColumn;
+use App\Models\RawScore;
 use App\Models\TeacherOffering;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -193,13 +197,165 @@ class TeacherAuthController extends Controller
                 'offering.subject',
                 'offering.program',
                 'offering.level',
+                'offering.gradingSystem',
                 'academicTerm',
             ])
             ->firstOrFail();
 
+        $academicTermType = $teacherOffering->academicTerm->type;
+        $periods = $academicTermType === 'semester' ? ['Prelim', 'Midterm', 'Semi-Final', 'Final'] : ($academicTermType === 'full year' ? ['Quarter 1', 'Quarter 2', 'Quarter 3', 'Quarter 4'] : ['Final']);
+
+        $components = $teacherOffering->offering->gradingSystem
+            ->components()
+            ->orderBy('created_at')
+            ->get() ?? collect();
+
         return view('teacher_portal.input_grade', [
             'teacher' => $teacher,
             'teacherOffering' => $teacherOffering,
+            'periods' => $periods,
+            'components' => $components,
+        ]);
+    }
+
+    public function getStudentGrades(Request $request, $teacherOfferingId)
+    {
+        $teacher = $this->getLoggedInTeacher();
+
+        if (!$teacher) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $teacherOffering = TeacherOffering::query()
+            ->where('id', $teacherOfferingId)
+            ->where('teacher_id', $teacher->id)
+            ->with('offering.gradingSystem.components')
+            ->firstOrFail();
+
+        $period = $request->query('period');
+        if (!$period) {
+            return response()->json(['error' => 'Period is required'], 400);
+        }
+
+        // Fetch enrolled student IDs for this subject offering + academic term
+        $studentIds = Enlistment::query()
+            ->where('subject_offering_id', $teacherOffering->offering_id)
+            ->where('academic_term_id', $teacherOffering->academic_term_id)
+            ->pluck('student_id')
+            ->unique()
+            ->values();
+
+        // Ensure a Grade record exists for each student for this teacher offering + period
+        foreach ($studentIds as $studentId) {
+            Grade::firstOrCreate([
+                'teacher_offering_id' => $teacherOfferingId,
+                'student_id' => $studentId,
+                'period' => $period,
+            ], [
+                'status' => 'draft',
+            ]);
+        }
+
+        $grades = Grade::query()
+            ->with('student')
+            ->where('teacher_offering_id', $teacherOfferingId)
+            ->where('period', $period)
+            ->orderBy('created_at')
+            ->get();
+
+        $students = $grades->map(function ($grade) {
+            $student = $grade->student;
+            $studentName = trim($student->last_name . ', ' . $student->first_name . ' ' . ($student->middle_name ? substr($student->middle_name, 0, 1) . '.' : ''));
+
+            return [
+                'grade_id' => $grade->id,
+                'student_id' => $student->id,
+                'student_number' => $student->student_number,
+                'student_name' => $studentName,
+                'initial_grade' => $grade->initial_grade,
+                'period_grade' => $grade->period_grade,
+                'status' => $grade->status,
+            ];
+        });
+
+        $components = $teacherOffering->offering->gradingSystem?->components ?? collect();
+
+        $columns = GradeColumn::query()
+            ->with('component')
+            ->where('teacher_offering_id', $teacherOfferingId)
+            ->where('period', $period)
+            ->orderBy('column_number')
+            ->get()
+            ->map(function ($col) {
+                return [
+                    'id' => $col->id,
+                    'component_id' => $col->component_id,
+                    'component_code' => $col->component?->code ?? '',
+                    'column_number' => $col->column_number,
+                    'highest_score' => $col->highest_score,
+                    'period' => $col->period,
+                ];
+            });
+
+        $rawScores = RawScore::query()
+            ->whereIn('grade_id', $grades->pluck('id'))
+            ->whereIn('grade_column_id', $columns->pluck('id'))
+            ->get()
+            ->map(function ($rawScore) {
+                return [
+                    'id' => $rawScore->id,
+                    'grade_id' => $rawScore->grade_id,
+                    'grade_column_id' => $rawScore->grade_column_id,
+                    'score' => $rawScore->score,
+                ];
+            });
+
+        return response()->json([
+            'period' => $period,
+            'students' => $students,
+            'components' => $components->map(fn($c) => [
+                'id' => $c->id,
+                'name' => $c->name,
+                'description' => $c->description ?? null,
+                'percentage' => $c->percentage ?? null,
+            ])->values(),
+            'columns' => $columns,
+            'rawScores' => $rawScores,
+        ]);
+    }
+
+    public function getComponentColumns(Request $request, $teacherOfferingId)
+    {
+        $teacher = $this->getLoggedInTeacher();
+
+        if (!$teacher) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $teacherOffering = TeacherOffering::query()
+            ->where('id', $teacherOfferingId)
+            ->where('teacher_id', $teacher->id)
+            ->firstOrFail();
+
+        $columns = GradeColumn::query()
+            ->with('component')
+            ->where('teacher_offering_id', $teacherOfferingId)
+            ->where('period', $request->query('period'))
+            ->orderBy('column_number')
+            ->get()
+            ->map(function ($col) {
+                return [
+                    'id' => $col->id,
+                    'component_id' => $col->component_id,
+                    'component_code' => $col->component?->code ?? '',
+                    'column_number' => $col->column_number,
+                    'highest_score' => $col->highest_score,
+                    'period' => $col->period,
+                ];
+            });
+
+        return response()->json([
+            'columns' => $columns,
         ]);
     }
 }

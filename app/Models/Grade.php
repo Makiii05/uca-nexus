@@ -4,65 +4,50 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Grade extends Model
 {
+    protected $table = 'grade';
+
     protected $fillable = [
+        'teacher_offering_id',
         'student_id',
-        'teacher_id',
-        'term_id',
-        'grading_period',
-        'ww_whole',
-        'pt_whole',
-        'qa_whole',
-        'ww_total',
-        'pt_total',
-        'qa_total',
-        'ww_percent',
-        'pt_percent',
-        'qa_percent',
+        'period',
         'initial_grade',
         'period_grade',
         'status',
-        'is_direct_input',
-        'submtted_at',
+        'submitted_at',
         'approved_by',
         'approved_at',
-        'fnalized_at',
-        'remarks',
+        'finalized_at',
     ];
 
     protected $casts = [
-        'ww_whole' => 'decimal:2',
-        'pt_whole' => 'decimal:2',
-        'qa_whole' => 'decimal:2',
-        'ww_total' => 'decimal:2',
-        'pt_total' => 'decimal:2',
-        'qa_total' => 'decimal:2',
-        'ww_percent' => 'decimal:2',
-        'pt_percent' => 'decimal:2',
-        'qa_percent' => 'decimal:2',
         'initial_grade' => 'decimal:2',
         'period_grade' => 'decimal:2',
-        'is_direct_input' => 'boolean',
-        'submtted_at' => 'datetime',
-        'approved_by' => 'datetime',
+        'submitted_at' => 'datetime',
         'approved_at' => 'datetime',
-        'fnalized_at' => 'datetime',
+        'finalized_at' => 'datetime',
     ];
+
+    public function teacherOffering(): BelongsTo
+    {
+        return $this->belongsTo(TeacherOffering::class);
+    }
 
     public function student(): BelongsTo
     {
         return $this->belongsTo(Student::class);
     }
 
-    public function teacher(): BelongsTo
+    public function approvedBy(): BelongsTo
     {
-        return $this->belongsTo(Teacher::class);
+        return $this->belongsTo(User::class, 'approved_by');
     }
 
-    public function academicTerm(): BelongsTo
+    public function rawScores(): HasMany
     {
-        return $this->belongsTo(AcademicTerm::class, 'term_id');
+        return $this->hasMany(RawScore::class);
     }
 }

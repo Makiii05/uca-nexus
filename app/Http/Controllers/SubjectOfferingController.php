@@ -11,6 +11,8 @@ use App\Models\AcademicTerm;
 use App\Models\Subject;
 use App\Models\Program;
 use App\Models\SubjectOffering;
+use App\Models\GradingSystem;
+use Illuminate\Validation\Rule;
 
 class SubjectOfferingController extends Controller
 {
@@ -28,12 +30,16 @@ class SubjectOfferingController extends Controller
             ->orderBy('code')
             ->get();
 
+        $gradingSystems = GradingSystem::where('department_id', $departmentId)
+            ->orderBy('description')
+            ->get(['id', 'description', 'total_percentage']);
+
         // Load subject offerings for this academic term and department
         $subjectOfferings = collect();
         if ($academicTerm) {
             $subjectOfferings = SubjectOffering::where('academic_term_id', $academicTerm->id)
                 ->where('department_id', $departmentId)
-                ->with(['subject', 'level', 'enlistments'])
+                ->with(['subject', 'level', 'gradingSystem', 'enlistments'])
                 ->get();
         }
 
@@ -43,6 +49,7 @@ class SubjectOfferingController extends Controller
             'academicTerm' => $academicTerm,
             'subjectOfferings' => $subjectOfferings,
             'departmentId' => $departmentId,
+            'gradingSystems' => $gradingSystems,
         ]);
     }
 
@@ -77,12 +84,16 @@ class SubjectOfferingController extends Controller
             ->orderBy('code')
             ->get();
 
+        $gradingSystems = GradingSystem::where('department_id', $departmentId)
+            ->orderBy('description')
+            ->get(['id', 'description', 'total_percentage']);
+
         // Load subject offerings for this academic term and department
         $subjectOfferings = collect();
         if ($academicTerm) {
             $subjectOfferings = SubjectOffering::where('academic_term_id', $academicTerm->id)
                 ->where('department_id', $departmentId)
-                ->with(['subject', 'level', 'enlistments'])
+                ->with(['subject', 'level', 'gradingSystem', 'enlistments'])
                 ->get();
         }
 
@@ -95,6 +106,7 @@ class SubjectOfferingController extends Controller
             'academicTerm' => $academicTerm,
             'subjectOfferings' => $subjectOfferings,
             'departmentId' => $departmentId,
+            'gradingSystems' => $gradingSystems,
         ]);
     }
 
@@ -130,6 +142,12 @@ class SubjectOfferingController extends Controller
             'subject_id' => 'required|exists:subjects,id',
             'program_id' => 'required|exists:programs,id',
             'level_id' => 'nullable|exists:levels,id',
+            'grading_id' => [
+                'required',
+                Rule::exists('grading_systems', 'id')->where(function ($query) use ($departmentId) {
+                    $query->where('department_id', $departmentId);
+                }),
+            ],
         ]);
 
         $subject = Subject::findOrFail($validated['subject_id']);
@@ -162,11 +180,12 @@ class SubjectOfferingController extends Controller
             'subject_id' => $validated['subject_id'],
             'program_id' => $validated['program_id'],
             'level_id' => $validated['level_id'] ?? null,
+            'grading_id' => $validated['grading_id'],
             'code' => $code,
             'description' => $subject->description,
         ]);
 
-        $subjectOffering->load(['subject', 'level']);
+        $subjectOffering->load(['subject', 'level', 'gradingSystem']);
 
         return response()->json($subjectOffering, 201);
     }
@@ -188,7 +207,7 @@ class SubjectOfferingController extends Controller
     {
         $subjectOfferings = SubjectOffering::where('academic_term_id', $academicTermId)
             ->where('department_id', $departmentId)
-            ->with('subject')
+            ->with(['subject', 'gradingSystem'])
             ->get();
 
         return response()->json($subjectOfferings);
@@ -211,5 +230,19 @@ class SubjectOfferingController extends Controller
             ->get(['id', 'code', 'description', 'order']);
 
         return response()->json($levels);
+    }
+
+    public function getGradingSystemsByDepartment(Request $request, $departmentId)
+    {
+        $userDepartmentId = $request->user()->department_id;
+        if ((int) $departmentId !== (int) $userDepartmentId) {
+            return response()->json([], 403);
+        }
+
+        $gradingSystems = GradingSystem::where('department_id', $userDepartmentId)
+            ->orderBy('description')
+            ->get(['id', 'description', 'total_percentage']);
+
+        return response()->json($gradingSystems);
     }
 }

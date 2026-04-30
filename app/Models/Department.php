@@ -16,4 +16,12 @@ class Department extends Model
     public function programs(){
         return $this->hasMany(Program::class);
     }
+
+    public function components(){
+        return $this->hasMany(Component::class);
+    }
+
+    public function gradingSystems(){
+        return $this->hasMany(GradingSystem::class);
+    }
 }

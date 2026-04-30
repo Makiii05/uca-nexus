@@ -77,7 +77,7 @@
                                                 <tbody>
                                                     @foreach ($groupedByTerm->sortBy('subject.description') as $prospectus)
                                                     <tr class="cursor-pointer hover:bg-blue-50 transition-colors duration-150"
-                                                        onclick="addOfferingWithProgramAndLevel({{ $prospectus->subject->id }}, {{ $level->program->id }}, {{ $level->id }})">
+                                                        onclick="openProspectusGradingModal({{ $prospectus->subject->id }}, {{ $level->program->id }}, {{ $level->id }})">
                                                         <td>{{ $prospectus->subject->code }}</td>
                                                         <td>{{ $prospectus->subject->description }}</td>
                                                         <td>{{ $prospectus->subject->unit }}</td>
@@ -198,9 +198,44 @@
                     <option value="">-- Select Program First --</option>
                 </select>
             </div>
+            <div class="form-control mb-3">
+                <label class="label"><span class="label-text">Grading System</span></label>
+                <select id="subjectGradingSelect" class="select select-bordered w-full" required>
+                    <option value="">-- Select Grading System --</option>
+                    @foreach (($gradingSystems ?? collect()) as $gradingSystem)
+                        <option value="{{ $gradingSystem->id }}">{{ $gradingSystem->description }} ({{ number_format((float) $gradingSystem->total_percentage, 2) }}%)</option>
+                    @endforeach
+                </select>
+            </div>
             <div class="modal-action">
                 <button type="button" class="btn btn-ghost" onclick="document.getElementById('programSelectModal').close();">Cancel</button>
                 <button type="button" class="btn btn-primary" onclick="confirmAddWithProgramAndLevel()">Add to Offerings</button>
+            </div>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
+    <dialog id="prospectusGradingModal" class="modal">
+        <div class="modal-box">
+            <h3 class="text-lg font-bold mb-4">Select Grading System</h3>
+            <p class="text-sm text-gray-500 mb-3">Choose the grading system for this subject offering.</p>
+            <input type="hidden" id="prospectusPendingSubjectId" value="" />
+            <input type="hidden" id="prospectusPendingProgramId" value="" />
+            <input type="hidden" id="prospectusPendingLevelId" value="" />
+            <div class="form-control mb-3">
+                <label class="label"><span class="label-text">Grading System</span></label>
+                <select id="prospectusGradingSelect" class="select select-bordered w-full" required>
+                    <option value="">-- Select Grading System --</option>
+                    @foreach (($gradingSystems ?? collect()) as $gradingSystem)
+                        <option value="{{ $gradingSystem->id }}">{{ $gradingSystem->description }} ({{ number_format((float) $gradingSystem->total_percentage, 2) }}%)</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="modal-action">
+                <button type="button" class="btn btn-ghost" onclick="document.getElementById('prospectusGradingModal').close();">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="confirmAddFromProspectus()">Add to Offerings</button>
             </div>
         </div>
         <form method="dialog" class="modal-backdrop">
@@ -217,6 +252,7 @@
     const removeSubjectOfferingUrl = '{{ url("/department/subject-offering") }}';
     const searchSubjectsUrl = '{{ route("department.api.subjects.search") }}';
     const levelsByProgramUrl = '{{ url("/department/api/levels-by-program") }}';
+    const gradingSystemsCount = {{ ($gradingSystems ?? collect())->count() }};
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     const academicTermId = {{ isset($academicTerm) ? $academicTerm->id : 'null' }};
     const departmentId = {{ $departmentId ?? 'null' }};
@@ -242,12 +278,49 @@
     }
 
     // For prospectus rows — program and level are already known
-    function addOfferingWithProgramAndLevel(subjectId, programId, levelId) {
+    function addOfferingWithProgramAndLevel(subjectId, programId, levelId, gradingId) {
         if (!academicTermId) {
             alert('No academic term selected.');
             return;
         }
-        submitAddOffering(subjectId, programId, levelId);
+        if (!gradingId) {
+            alert('Please select a grading system.');
+            return;
+        }
+        submitAddOffering(subjectId, programId, levelId, gradingId);
+    }
+
+    function openProspectusGradingModal(subjectId, programId, levelId) {
+        if (!academicTermId) {
+            alert('No academic term selected.');
+            return;
+        }
+
+        if (gradingSystemsCount < 1) {
+            alert('No grading systems found for your department. Please create one first.');
+            return;
+        }
+
+        document.getElementById('prospectusPendingSubjectId').value = subjectId;
+        document.getElementById('prospectusPendingProgramId').value = programId;
+        document.getElementById('prospectusPendingLevelId').value = levelId;
+        document.getElementById('prospectusGradingSelect').value = '';
+        document.getElementById('prospectusGradingModal').showModal();
+    }
+
+    function confirmAddFromProspectus() {
+        const subjectId = document.getElementById('prospectusPendingSubjectId').value;
+        const programId = document.getElementById('prospectusPendingProgramId').value;
+        const levelId = document.getElementById('prospectusPendingLevelId').value;
+        const gradingId = document.getElementById('prospectusGradingSelect').value;
+
+        if (!gradingId) {
+            alert('Please select a grading system.');
+            return;
+        }
+
+        document.getElementById('prospectusGradingModal').close();
+        addOfferingWithProgramAndLevel(subjectId, programId, levelId, gradingId);
     }
 
     // For subject search rows — need to pick a program and level first
@@ -260,6 +333,13 @@
         document.getElementById('programSelect').value = '';
         document.getElementById('levelSelect').innerHTML = '<option value="">-- Select Program First --</option>';
         document.getElementById('levelSelect').disabled = true;
+        document.getElementById('subjectGradingSelect').value = '';
+
+        if (gradingSystemsCount < 1) {
+            alert('No grading systems found for your department. Please create one first.');
+            return;
+        }
+
         document.getElementById('programSelectModal').showModal();
     }
 
@@ -300,6 +380,7 @@
         const subjectId = document.getElementById('pendingSubjectId').value;
         const programId = document.getElementById('programSelect').value;
         const levelId = document.getElementById('levelSelect').value;
+        const gradingId = document.getElementById('subjectGradingSelect').value;
         if (!programId) {
             alert('Please select a program.');
             return;
@@ -308,17 +389,22 @@
             alert('Please select a level.');
             return;
         }
+        if (!gradingId) {
+            alert('Please select a grading system.');
+            return;
+        }
         document.getElementById('programSelectModal').close();
-        submitAddOffering(subjectId, programId, levelId);
+        submitAddOffering(subjectId, programId, levelId, gradingId);
     }
 
     // Shared add offering function
-    async function submitAddOffering(subjectId, programId, levelId = null) {
+    async function submitAddOffering(subjectId, programId, levelId = null, gradingId = null) {
         try {
             const payload = {
                 academic_term_id: academicTermId,
                 subject_id: subjectId,
                 program_id: programId,
+                grading_id: gradingId,
             };
             if (levelId) {
                 payload.level_id = levelId;

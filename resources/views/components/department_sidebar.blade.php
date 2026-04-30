@@ -73,6 +73,24 @@
             </li>
 
             <li>
+              <a href="{{ route('department.grading_components.index') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right" data-tip="Grading Components">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 3.75h9m-9 5.25h9m-9 5.25h9m-9 5.25h9M3.75 3.75h.008v.008H3.75V3.75Zm0 5.25h.008v.008H3.75V9Zm0 5.25h.008v.008H3.75v-.008Zm0 5.25h.008v.008H3.75v-.008Z" />
+                </svg>
+                <span class="is-drawer-close:hidden">Grading Components</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="{{ route('department.grading_systems.index') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right" data-tip="Grading Systems">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.5h16.5M3.75 9.75h16.5m-16.5 5.25h10.5m-10.5 5.25h7.5" />
+                </svg>
+                <span class="is-drawer-close:hidden">Grading Systems</span>
+              </a>
+            </li>
+
+            <li>
               <a href="{{ route('department.teacher_loading') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right" data-tip="Teacher Loading">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
