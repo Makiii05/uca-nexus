@@ -155,4 +155,52 @@ class GradeController extends Controller
 			'component_total' => $componentTotal,
 		]);
 	}
+
+	public function updateGradeStatus(Request $request, $gradeId)
+	{
+		$validated = $request->validate([
+			'status' => ['required', 'string', 'in:draft,submitted,approved,rejected'],
+			'initial_grade' => ['nullable', 'numeric'],
+			'period_grade' => ['nullable', 'numeric'],
+		]);
+
+		$grade = Grade::query()->findOrFail($gradeId);
+
+		// Only allow teacher who owns the offering to change status
+		$teacher = $this->getLoggedInTeacher();
+		if (!$teacher) {
+			return response()->json(['error' => 'Unauthorized'], 401);
+		}
+
+		$teacherOffering = TeacherOffering::query()->where('id', $grade->teacher_offering_id)->where('teacher_id', $teacher->id)->first();
+		if (!$teacherOffering) {
+			return response()->json(['error' => 'Unauthorized'], 401);
+		}
+
+		$initialGrade = $validated['initial_grade'] ?? null;
+		$periodGrade = $validated['period_grade'] ?? null;
+
+		if ($initialGrade === null || (float) $initialGrade <= 0) {
+			return response()->json([
+				'id' => $grade->id,
+				'status' => $grade->status,
+				'skipped' => true,
+			]);
+		}
+
+		$grade->fill([
+			'initial_grade' => $initialGrade,
+			'period_grade' => $periodGrade,
+			'status' => $validated['status'],
+			'submitted_at' => now(),
+		]);
+		$grade->save();
+
+		return response()->json([
+			'id' => $grade->id,
+			'status' => $grade->status,
+			'initial_grade' => $grade->initial_grade,
+			'period_grade' => $grade->period_grade,
+		]);
+	}
 }

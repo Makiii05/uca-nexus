@@ -35,5 +35,6 @@ Route::prefix('teacher-portal')->name('teacher_portal.')->group(function () {
         Route::post('/api/grade-column/{teacherOfferingId}', [GradeController::class, 'storeGradeColumn'])->name('api.grade_column.store');
         Route::delete('/api/grade-column/{gradeColumnId}', [GradeController::class, 'deleteGradeColumn'])->name('api.grade_column.delete');
         Route::patch('/api/raw-score/{gradeId}/{gradeColumnId}', [GradeController::class, 'updateRawScore'])->name('api.raw_score.update');
+        Route::patch('/api/grade/{gradeId}/status', [GradeController::class, 'updateGradeStatus'])->name('api.grade.update_status');
     });
 });

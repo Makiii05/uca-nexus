@@ -38,7 +38,7 @@
             </div>
 
             <div class="mt-6">
-                <div class="tabs tabs-lifted tabs-lg mb-4">
+                <div class="tabs tabs-lift tabs-lg mb-4">
                     <a id="tab-raw-btn" class="tab tab-active">Raw Score Sheet</a>
                     <a id="tab-detailed-btn" class="tab">Detailed Score</a>
                     <a id="tab-direct-btn" class="tab">Direct Score</a>
@@ -52,6 +52,11 @@
                                 <thead id="table-header"></thead>
                                 <tbody id="student-list-body"></tbody>
                             </table>
+                        </div>
+                        <div class="mt-4 flex justify-end">
+                            <button type="button" id="submit-shown-grades-btn" class="btn btn-primary btn-md" disabled>
+                                Submit for Approval
+                            </button>
                         </div>
                         <p id="no-students-text" class="text-sm text-gray-600 mt-3 hidden">No students are enrolled for this offering.</p>
                     </div>
@@ -92,6 +97,7 @@
         const directTableHeader = document.getElementById('direct-table-header');
         const directTableBody = document.getElementById('direct-table-body');
         const noStudentsText = document.getElementById('no-students-text');
+        const submitShownGradesBtn = document.getElementById('submit-shown-grades-btn');
         const subjectEducationLevel = '{{ strtolower($teacherOffering->offering?->subject?->education_level ?? '') }}';
 
         const directGradeOptions = [
@@ -126,6 +132,9 @@
             currentPeriod = period;
             if (!period) {
                 studentListContainer.classList.add('hidden');
+                if (submitShownGradesBtn) {
+                    submitShownGradesBtn.disabled = true;
+                }
                 return;
             }
 
@@ -154,9 +163,15 @@
 
                 if (students.length === 0) {
                     noStudentsText.classList.remove('hidden');
+                    if (submitShownGradesBtn) {
+                        submitShownGradesBtn.disabled = true;
+                    }
                     renderDetailedScores([]);
                     renderDirectScores([]);
                     return;
+                }
+                if (submitShownGradesBtn) {
+                    submitShownGradesBtn.disabled = false;
                 }
                 renderTableHeader();
                 renderStudents(students);
@@ -452,7 +467,9 @@
 
                 const statusCell = document.createElement('td');
                 statusCell.className = 'text-center font-semibold';
-                statusCell.textContent = student.status || 'draft';
+                const statusTextDiv = document.createElement('div');
+                statusTextDiv.textContent = student.status || 'draft';
+                statusCell.appendChild(statusTextDiv);
                 row.appendChild(statusCell);
 
                 directTableBody.appendChild(row);
@@ -769,6 +786,77 @@
             }
         }
 
+        async function submitShownGradesForApproval() {
+            if (!currentStudents.length || !submitShownGradesBtn) {
+                return;
+            }
+
+            const eligibleStudents = currentStudents
+                .map(student => {
+                    const calculatedGrades = calculateStudentGrades(student);
+                    return {
+                        student,
+                        initialGrade: Number(calculatedGrades.initialGrade),
+                        periodGrade: Number(calculatedGrades.periodGrade),
+                    };
+                })
+                .filter(item => item.initialGrade > 0);
+
+            if (eligibleStudents.length === 0) {
+                alert('No students with an initial grade above 0 are ready for submission.');
+                return;
+            }
+
+            const originalText = submitShownGradesBtn.textContent;
+            submitShownGradesBtn.disabled = true;
+            submitShownGradesBtn.textContent = 'Submitting...';
+
+            try {
+                const responses = await Promise.all(eligibleStudents.map(item => fetch(`{{ url('/teacher-portal/api/grade') }}/${item.student.grade_id}/status`, {
+                    method: 'PATCH',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        status: 'submitted',
+                        initial_grade: item.initialGrade,
+                        period_grade: item.periodGrade,
+                    })
+                })));
+
+                const failedResponses = responses.filter(response => !response.ok);
+                if (failedResponses.length > 0) {
+                    throw new Error(`Failed to submit ${failedResponses.length} grade(s)`);
+                }
+
+                currentStudents = currentStudents.map(student => {
+                    const submittedItem = eligibleStudents.find(item => String(item.student.grade_id) === String(student.grade_id));
+
+                    if (!submittedItem) {
+                        return student;
+                    }
+
+                    return {
+                        ...student,
+                        status: 'submitted',
+                        initial_grade: submittedItem.initialGrade,
+                        period_grade: submittedItem.periodGrade,
+                    };
+                });
+
+                renderStudents(currentStudents);
+                renderDetailedScores(currentStudents);
+                renderDirectScores(currentStudents);
+            } catch (error) {
+                console.error('Error submitting for approval:', error);
+                alert('Failed to submit for approval');
+                submitShownGradesBtn.disabled = false;
+                submitShownGradesBtn.textContent = originalText;
+            }
+        }
+
         // Tab switching logic (web-style tabs)
         function showTab(paneId, btnId) {
             document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
@@ -788,6 +876,7 @@
             if (rawBtn) rawBtn.addEventListener('click', (e) => { e.preventDefault(); showTab('raw-score-pane', 'tab-raw-btn'); });
             if (detailedBtn) detailedBtn.addEventListener('click', (e) => { e.preventDefault(); showTab('detailed-score-pane', 'tab-detailed-btn'); });
             if (directBtn) directBtn.addEventListener('click', (e) => { e.preventDefault(); showTab('direct-score-pane', 'tab-direct-btn'); });
+            if (submitShownGradesBtn) submitShownGradesBtn.addEventListener('click', submitShownGradesForApproval);
 
             // default tab
             showTab('raw-score-pane', 'tab-raw-btn');

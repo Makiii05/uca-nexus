@@ -13,6 +13,7 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\RegistrarStudentController;
+use App\Http\Controllers\RegistrarGradeApprovalController;
 use App\Http\Controllers\ClassListController;
 use App\Http\Controllers\EnrollmentStatusController;
 
@@ -78,6 +79,14 @@ Route::prefix('registrar')->name('registrar.')->group(function () {
         Route::post('/prospectuses', [ProspectusController::class, 'createProspectus'])->name('prospectus.create');
         Route::post('/prospectuses/{id}/update', [ProspectusController::class, 'updateProspectus'])->name('prospectus.update');
         Route::post('/prospectuses/{id}/delete', [ProspectusController::class, 'deleteProspectus'])->name('prospectus.delete');
+
+        Route::get('/grade-approval', [RegistrarGradeApprovalController::class, 'showGradeApproval'])->name('grade_approval');
+        Route::get('/api/grade-approval/teachers', [RegistrarGradeApprovalController::class, 'getTeachersByDepartment'])->name('api.grade_approval.teachers');
+        Route::get('/api/grade-approval/academic-terms', [RegistrarGradeApprovalController::class, 'getAcademicTermsByDepartment'])->name('api.grade_approval.academic_terms');
+        Route::get('/api/grade-approval/subject-offerings', [RegistrarGradeApprovalController::class, 'getSubjectOfferings'])->name('api.grade_approval.subject_offerings');
+        Route::get('/api/grade-approval/periods', [RegistrarGradeApprovalController::class, 'getPeriodsByAcademicTerm'])->name('api.grade_approval.periods');
+        Route::get('/api/grade-approval/grades', [RegistrarGradeApprovalController::class, 'getSubmittedGrades'])->name('api.grade_approval.grades');
+        Route::patch('/api/grade-approval/grades/{gradeId}/status', [RegistrarGradeApprovalController::class, 'updateGradeStatus'])->name('api.grade_approval.update_status');
         
         // API routes for dynamic loading
         Route::get('/students', [RegistrarStudentController::class, 'showStudents'])->name('student');
