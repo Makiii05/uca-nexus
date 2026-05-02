@@ -14,6 +14,7 @@ use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\RegistrarStudentController;
 use App\Http\Controllers\RegistrarGradeApprovalController;
+use App\Http\Controllers\RegistrarGradeReportController;
 use App\Http\Controllers\ClassListController;
 use App\Http\Controllers\EnrollmentStatusController;
 
@@ -87,6 +88,16 @@ Route::prefix('registrar')->name('registrar.')->group(function () {
         Route::get('/api/grade-approval/periods', [RegistrarGradeApprovalController::class, 'getPeriodsByAcademicTerm'])->name('api.grade_approval.periods');
         Route::get('/api/grade-approval/grades', [RegistrarGradeApprovalController::class, 'getSubmittedGrades'])->name('api.grade_approval.grades');
         Route::patch('/api/grade-approval/grades/{gradeId}/status', [RegistrarGradeApprovalController::class, 'updateGradeStatus'])->name('api.grade_approval.update_status');
+
+        // Grade Report routes
+        Route::get('/grade-report', [RegistrarGradeReportController::class, 'index'])->name('grade_report');
+        Route::get('/grade-report/students/{studentId}/view', [RegistrarGradeReportController::class, 'view'])->name('grade_report.view');
+        Route::get('/grade-report/students/{studentId}/pdf', [RegistrarGradeReportController::class, 'pdf'])->name('grade_report.pdf');
+        Route::get('/grade-report/pdf', [RegistrarGradeReportController::class, 'pdfAll'])->name('grade_report.pdf_all');
+
+        Route::get('/api/grade-report/academic-terms', [RegistrarGradeReportController::class, 'getAcademicTerms'])->name('api.grade_report.academic_terms');
+        Route::get('/api/grade-report/subject-offerings', [RegistrarGradeReportController::class, 'getSubjectOfferings'])->name('api.grade_report.subject_offerings');
+        Route::get('/api/grade-report/periods', [RegistrarGradeReportController::class, 'getPeriods'])->name('api.grade_report.periods');
         
         // API routes for dynamic loading
         Route::get('/students', [RegistrarStudentController::class, 'showStudents'])->name('student');
