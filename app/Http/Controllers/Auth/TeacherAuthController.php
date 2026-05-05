@@ -7,10 +7,13 @@ use App\Models\AcademicTerm;
 use App\Models\Teacher;
 use App\Models\TeacherAccount;
 use App\Models\Enlistment;
+use App\Models\Student;
+use App\Models\Transaction;
 use App\Models\Grade;
 use App\Models\GradeColumn;
 use App\Models\RawScore;
 use App\Models\TeacherOffering;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -297,8 +300,12 @@ class TeacherAuthController extends Controller
             ->unique()
             ->values();
 
-        $students = \App\Models\Student::query()
-            ->whereIn('id', $studentIds)
+        $eligibleStudentIds = $this->getDownPaymentStudentIdsFromTransactions($studentIds, (int) $teacherOffering->academic_term_id);
+
+        $students = Student::query()
+            ->whereIn('id', $eligibleStudentIds)
+            ->orderBy('last_name')
+            ->orderBy('first_name')
             ->get()
             ->map(function ($s) {
                 $name = trim($s->last_name . ', ' . $s->first_name . ' ' . ($s->middle_name ? substr($s->middle_name, 0, 1) . '.' : ''));
@@ -310,6 +317,83 @@ class TeacherAuthController extends Controller
             })->values();
 
         return response()->json(['students' => $students]);
+    }
+
+    /**
+     * Print class list PDF for a teacher offering (teacher portal).
+     */
+    public function printClassList(Request $request, $teacherOfferingId)
+    {
+        $teacher = $this->getLoggedInTeacher();
+
+        if (!$teacher) {
+            return redirect()->route('teacher_portal.login');
+        }
+
+        $teacherOffering = TeacherOffering::query()
+            ->where('id', $teacherOfferingId)
+            ->where('teacher_id', $teacher->id)
+            ->with([
+                'offering.subject',
+                'offering.program',
+                'offering.program.levels',
+                'offering.academicTerm',
+            ])
+            ->firstOrFail();
+
+        $subjectOffering = $teacherOffering->offering;
+        if (!$subjectOffering) {
+            abort(404);
+        }
+
+        $enlistedStudentIds = Enlistment::query()
+            ->where('subject_offering_id', $subjectOffering->id)
+            ->where('academic_term_id', $teacherOffering->academic_term_id)
+            ->pluck('student_id')
+            ->unique()
+            ->values();
+
+        $eligibleStudentIds = $this->getDownPaymentStudentIdsFromTransactions($enlistedStudentIds, (int) $teacherOffering->academic_term_id);
+
+        $enlistments = collect();
+        if ($eligibleStudentIds->isNotEmpty()) {
+            $enlistments = Enlistment::query()
+                ->where('subject_offering_id', $subjectOffering->id)
+                ->where('academic_term_id', $teacherOffering->academic_term_id)
+                ->whereIn('student_id', $eligibleStudentIds)
+                ->with(['student', 'student.level', 'student.program'])
+                ->get();
+        }
+
+        $femaleStudents = $enlistments->filter(function ($enlistment) {
+            return strtolower($enlistment->student->sex ?? '') === 'female';
+        })->sortBy(function ($enlistment) {
+            return ($enlistment->student->last_name ?? '') . ($enlistment->student->first_name ?? '');
+        });
+
+        $maleStudents = $enlistments->filter(function ($enlistment) {
+            return strtolower($enlistment->student->sex ?? '') === 'male';
+        })->sortBy(function ($enlistment) {
+            return ($enlistment->student->last_name ?? '') . ($enlistment->student->first_name ?? '');
+        });
+
+        $femaleStudents = $this->addOrNumberToStudents($femaleStudents, (int) $teacherOffering->academic_term_id);
+        $maleStudents = $this->addOrNumberToStudents($maleStudents, (int) $teacherOffering->academic_term_id);
+
+        $hasTuitionFees = $femaleStudents->contains(fn($e) => $e->or_number !== null) ||
+            $maleStudents->contains(fn($e) => $e->or_number !== null);
+
+        $yearLevel = $subjectOffering->program?->levels?->first()?->description ?? 'N/A';
+
+        $pdf = Pdf::loadView('pdf.classlist', [
+            'subjectOffering' => $subjectOffering,
+            'femaleStudents' => $femaleStudents,
+            'maleStudents' => $maleStudents,
+            'hasTuitionFees' => $hasTuitionFees,
+            'yearLevel' => $yearLevel,
+        ]);
+
+        return $pdf->stream('classlist_' . $subjectOffering->code . '.pdf');
     }
 
     public function showInputGrade($teacherOfferingId)
@@ -487,5 +571,46 @@ class TeacherAuthController extends Controller
         return response()->json([
             'columns' => $columns,
         ]);
+    }
+
+    /**
+     * Get student IDs that have a Down Payment transaction in the selected academic term.
+     */
+    private function getDownPaymentStudentIdsFromTransactions($studentIds, int $academicTermId)
+    {
+        $studentIds = collect($studentIds)->filter()->unique()->values();
+        if ($studentIds->isEmpty()) {
+            return collect();
+        }
+
+        return Transaction::query()
+            ->join('payment_accounts', 'transactions.description_id', '=', 'payment_accounts.id')
+            ->where('transactions.academic_term_id', $academicTermId)
+            ->whereIn('transactions.student_id', $studentIds)
+            ->whereRaw('LOWER(payment_accounts.description) IN (?, ?)', ['down payment', 'downpayment'])
+            ->distinct()
+            ->pluck('transactions.student_id')
+            ->values();
+    }
+
+    /**
+     * Add OR number column to students who have tuition fee transactions.
+     */
+    private function addOrNumberToStudents($students, int $academicTermId)
+    {
+        return $students->map(function ($enlistment) use ($academicTermId) {
+            $latestTuitionTransaction = Transaction::with('paymentType')
+                ->where('student_id', $enlistment->student->id)
+                ->where('academic_term_id', $academicTermId)
+                ->whereHas('paymentType', function ($query) {
+                    $query->where('description', 'like', '%tuition%');
+                })
+                ->orderBy('date', 'desc')
+                ->orderBy('id', 'desc')
+                ->first();
+
+            $enlistment->or_number = $latestTuitionTransaction?->or_number;
+            return $enlistment;
+        });
     }
 }

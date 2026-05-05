@@ -34,6 +34,7 @@
                     <th>Program</th>
                     <th>Level</th>
                     <th>Status</th>
+                    <th>Type</th>
                     <th data-no-sort>Actions</th>
                 </tr>
             </thead>
@@ -77,6 +78,7 @@
                             <td>${student.program?.code || '-'}</td>
                             <td>${student.level?.description || '-'}</td>
                             <td>${student.status ? student.status.charAt(0).toUpperCase() + student.status.slice(1) : '-'}</td>
+                            <td>${student.student_type || '-'}</td>
                             <td>
                                 <div class="flex gap-1 flex-wrap">
                                     <button 

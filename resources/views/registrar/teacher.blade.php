@@ -1,14 +1,17 @@
 <x-registrar_sidebar>
 
-    <div class="m-4 font-bold text-4xl">
-        <h2>Teacher</h2>
+    <div class="m-4 flex items-center justify-between gap-4">
+        <h2 class="font-bold text-4xl">Teacher</h2>
+        <div class="flex items-center gap-2">
+            <button type="button" class="btn btn-success" onclick="document.getElementById('import_teachers_modal').showModal();">
+                Import CSV
+            </button>
+            <button type="button" class="btn bg-white shadow" onclick="openTeacherCreateModal()">Add Teacher</button>
+        </div>
     </div>
 
     @include('partials.notifications')
-
-    <div class="m-4 grid">
-        <button class="btn w-auto justify-self-end bg-white shadow" onclick="openTeacherCreateModal()">Add Teacher</button>
-    </div>
+    @include('partials.import-teachers-modal')
 
     <x-teacher-form-modal />
 

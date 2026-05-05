@@ -31,6 +31,7 @@ Route::prefix('teacher-portal')->name('teacher_portal.')->group(function () {
 
         // Class List
         Route::get('/class-list', [TeacherAuthController::class, 'showClassList'])->name('class_list');
+        Route::get('/class-list/{teacherOfferingId}/print', [TeacherAuthController::class, 'printClassList'])->name('class_list.print');
 
         // Input Grade
         Route::get('/input-grade/{teacherOfferingId}', [TeacherAuthController::class, 'showInputGrade'])->name('input_grade');

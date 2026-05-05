@@ -371,6 +371,17 @@ class PdfController extends Controller
         // Get all enlistments for this subject offering with student info
         $enlistments = Enlistment::where('subject_offering_id', $id)
             ->with(['student', 'student.level', 'student.program'])
+            ->whereHas('student', function ($studentQuery) {
+                $studentQuery->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                        ->from('transactions')
+                        ->join('payment_accounts', 'transactions.description_id', '=', 'payment_accounts.id')
+                        ->join('academic_terms', 'transactions.academic_term_id', '=', 'academic_terms.id')
+                        ->whereColumn('transactions.student_id', 'students.id')
+                        ->where('payment_accounts.description', 'Down payment')
+                        ->where('academic_terms.status', 'active');
+                });
+            })
             ->get();
 
         // Separate students by sex
