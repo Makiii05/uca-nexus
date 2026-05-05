@@ -29,12 +29,12 @@
     
       <div class="drawer-side is-drawer-close:overflow-visible">
         <label for="my-drawer-4" aria-label="close sidebar" class="drawer-overlay"></label>
-        <div class="flex min-h-full flex-col items-start bg-white shadow is-drawer-close:w-14 is-drawer-open:w-64">
+        <div class="flex h-screen flex-col items-start bg-white shadow is-drawer-close:w-14 is-drawer-open:w-64 overflow-hidden">
           <!-- Sidebar content here -->
-          <ul class="menu w-full grow">
+          <ul class="menu w-full grow overflow-y-auto min-h-0">
             <!-- List item -->
             <li>
-              <a href="{{ route('admission.dashboard') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right" data-tip="Dashboard">
+              <a href="{{ route('admission.dashboard') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right {{ request()->routeIs('admission.dashboard') ? 'bg-black text-white' : '' }}" data-tip="Dashboard">
                 <!-- Home icon -->
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
@@ -46,7 +46,7 @@
                 
             <!-- List item -->
             <li>
-              <a href="{{ route('admission.applicant') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right" data-tip="Applicants">
+              <a href="{{ route('admission.applicant') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right {{ request()->routeIs('admission.applicant*') ? 'bg-black text-white' : '' }}" data-tip="Applicants">
                 <!-- User Group icon -->
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
@@ -56,7 +56,7 @@
             </li>
             <!-- List item -->
             <li>
-              <a href="{{ route('admission.student') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right" data-tip="Official Students">
+              <a href="{{ route('admission.student') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right {{ request()->routeIs('admission.student*') ? 'bg-black text-white' : '' }}" data-tip="Official Students">
                 <!-- Academic Cap icon -->
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
@@ -67,7 +67,7 @@
             @endif
             <!-- List item -->
             <li>
-              <a href="{{ route('admission.schedule') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right" data-tip="Schedules">
+              <a href="{{ route('admission.schedule') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right {{ request()->routeIs('admission.schedule*') ? 'bg-black text-white' : '' }}" data-tip="Schedules">
                 <!-- Calendar icon -->
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z" />
@@ -86,7 +86,7 @@
                 </summary>
                 <ul class="bg-gray-100 rounded-lg">
                   <li>
-                    <a href="{{ route('admission.interview') }}" class="my-1">
+                    <a href="{{ route('admission.interview') }}" class="my-1 {{ request()->routeIs('admission.interview') ? 'bg-black text-white' : '' }}">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
                       </svg>
@@ -94,7 +94,7 @@
                     </a>
                   </li>
                   <li>
-                    <a href="{{ route('admission.exam') }}" class="my-1">
+                    <a href="{{ route('admission.exam') }}" class="my-1 {{ request()->routeIs('admission.exam') ? 'bg-black text-white' : '' }}">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
                       </svg>
@@ -102,7 +102,7 @@
                     </a>
                   </li>
                   <li>
-                    <a href="{{ route('admission.evaluation') }}" class="my-1">
+                    <a href="{{ route('admission.evaluation') }}" class="my-1 {{ request()->routeIs('admission.evaluation') ? 'bg-black text-white' : '' }}">
                       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
                       </svg>
@@ -114,42 +114,51 @@
             </li>
             <!-- Collapsed state icons for evaluation items -->
             <li class="is-drawer-open:hidden">
-              <a href="{{ route('admission.interview') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right" data-tip="Interview">
+              <a href="{{ route('admission.interview') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right {{ request()->routeIs('admission.interview') ? 'bg-black text-white' : '' }}" data-tip="Interview">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
                 </svg>
               </a>
             </li>
             <li class="is-drawer-open:hidden">
-              <a href="{{ route('admission.exam') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right" data-tip="Entrance Exam">
+              <a href="{{ route('admission.exam') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right {{ request()->routeIs('admission.exam') ? 'bg-black text-white' : '' }}" data-tip="Entrance Exam">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
                 </svg>
               </a>
             </li>
             <li class="is-drawer-open:hidden">
-              <a href="{{ route('admission.evaluation') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right" data-tip="Final Evaluation">
+              <a href="{{ route('admission.evaluation') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right {{ request()->routeIs('admission.evaluation') ? 'bg-black text-white' : '' }}" data-tip="Final Evaluation">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
                 </svg>
               </a>
             </li>
           </ul>
-          <!-- Logout button -->
-          <div class="w-full p-2">
-            <form action="{{ route('admission.logout') }}" method="POST">
+          <div class="divider my-1 is-drawer-close:hidden"></div>
+          <div class="flex items-center justify-between gap-2 px-2 py-2 w-full">
+            <div class="text-sm font-semibold text-gray-700 truncate is-drawer-close:hidden flex-1 w-full">{{ auth()->user()->name }}</div>
+            <form action="{{ route('admission.logout') }}" method="POST" class="w-full is-drawer-open:w-auto">
               @csrf
-              <button type="submit" class="btn btn-ghost w-full justify-start is-drawer-close:justify-center is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right">
+              <button type="submit" class="btn btn-ghost btn-sm is-drawer-close:btn-square is-drawer-close:justify-center is-drawer-close:tooltip is-drawer-close:tooltip-right w-full is-drawer-open:w-auto" data-tip="Logout">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
                 </svg>
-                <span class="is-drawer-close:hidden">Logout</span>
+                
               </button>
             </form>
           </div>
         </div>
       </div>
     </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const drawerToggle = document.getElementById('my-drawer-4');
+        if (window.innerWidth >= 1024) {
+          drawerToggle.checked = true;
+        }
+      });
+    </script>
 </body>
 </html>
     

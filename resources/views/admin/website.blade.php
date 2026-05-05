@@ -124,7 +124,7 @@
     </div>
 
     <!-- Partials -->
-    @include('partials.website-notification')
+    @include('partials.notifications')
     @include('partials.website-form-modal')
     @include('partials.website-delete-modal')
     @include('partials.website-preview-modal')

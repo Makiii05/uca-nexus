@@ -741,7 +741,12 @@
 
     // Delete Prospectus - Async
     async function deleteProspectus(id, btn) {
-        if (!confirm('Are you sure you want to delete this prospectus?')) return;
+        const confirmed = await confirmDialog('Are you sure you want to delete this prospectus?', {
+            title: 'Confirm Delete',
+            confirmText: 'Delete',
+            confirmClass: 'btn-error'
+        });
+        if (!confirmed) return;
         
         const spinner = btn.querySelector('.loading');
         const row = btn.closest('tr');
@@ -795,25 +800,11 @@
 
     // Helper function to show alerts
     function showAlert(type, message) {
-        // Remove any existing alerts
-        const existingAlert = document.querySelector('.dynamic-alert');
-        if (existingAlert) existingAlert.remove();
+        if (typeof showToast === 'function') {
+            showToast(message, type === 'success' ? 'success' : 'error');
+            return;
+        }
 
-        const alertClass = type === 'success' ? 'bg-green-400' : 'bg-red-400';
-        const alertHtml = `
-            <div class="dynamic-alert m-4 alert ${alertClass} text-white">
-                <span>${message}</span>
-                <button onclick="this.parentElement.remove()" class="btn btn-sm btn-ghost">✕</button>
-            </div>
-        `;
-        
-        const container = document.querySelector('.m-4.font-bold');
-        container.insertAdjacentHTML('afterend', alertHtml);
-
-        // Auto-remove after 5 seconds
-        setTimeout(() => {
-            const alert = document.querySelector('.dynamic-alert');
-            if (alert) alert.remove();
-        }, 5000);
+        alert(message);
     }
 </script>

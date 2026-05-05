@@ -26,10 +26,10 @@
 
       <div class="drawer-side is-drawer-close:overflow-visible">
         <label for="my-drawer-4" aria-label="close sidebar" class="drawer-overlay"></label>
-        <div class="flex min-h-full flex-col items-start bg-white shadow is-drawer-close:w-14 is-drawer-open:w-64">
-          <ul class="menu w-full grow">
+        <div class="flex h-screen flex-col items-start bg-white shadow is-drawer-close:w-14 is-drawer-open:w-64 overflow-hidden">
+          <ul class="menu w-full grow overflow-y-auto min-h-0">
             <li>
-              <a href="{{ route('teacher_portal.dashboard') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right {{ request()->routeIs('teacher_portal.dashboard') ? 'active' : '' }}" data-tip="Dashboard">
+              <a href="{{ route('teacher_portal.dashboard') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right {{ request()->routeIs('teacher_portal.dashboard') ? 'bg-black text-white' : '' }}" data-tip="Dashboard">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
                 </svg>
@@ -38,28 +38,62 @@
             </li>
 
             <li>
-              <a href="{{ route('teacher_portal.subject_load') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right {{ request()->routeIs('teacher_portal.subject_load') ? 'active' : '' }}" data-tip="Subject Load">
+              <a href="{{ route('teacher_portal.subject_load') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right {{ request()->routeIs('teacher_portal.subject_load') ? 'bg-black text-white' : '' }}" data-tip="Subject Load">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
                 </svg>
                 <span class="is-drawer-close:hidden">Subject Load</span>
               </a>
             </li>
+
+            <li>
+              <a href="{{ route('teacher_portal.class_list') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right {{ request()->routeIs('teacher_portal.class_list') ? 'bg-black text-white' : '' }}" data-tip="Class List">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3V7M8 3v4M16 3v4M3 11h18" />
+                </svg>
+                <span class="is-drawer-close:hidden">Class List</span>
+              </a>
+            </li>
+
+            <li>
+              <a href="{{ route('teacher_portal.change_password') }}" class="is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right {{ request()->routeIs('teacher_portal.change_password') ? 'bg-black text-white' : '' }}" data-tip="Change Password">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                </svg>
+                <span class="is-drawer-close:hidden">Change Password</span>
+              </a>
+            </li>
           </ul>
 
-          <div class="w-full p-2">
-            <form action="{{ route('teacher_portal.logout') }}" method="POST">
+          <div class="divider my-1 is-drawer-close:hidden"></div>
+          <div class="flex items-center justify-between gap-2 px-2 py-2">
+            <div class="text-sm font-semibold text-gray-700 truncate is-drawer-close:hidden flex-1 w-full">
+            @php
+                $teacher = \App\Models\Teacher::find(session('teacher_portal_teacher_id'));
+            @endphp
+
+            {{ $teacher?->first_name }} {{ $teacher?->last_name }}            
+            </div>
+            <form action="{{ route('teacher_portal.logout') }}" method="POST" class="w-full is-drawer-open:w-auto">
               @csrf
-              <button type="submit" class="btn btn-ghost w-full justify-start is-drawer-close:justify-center is-drawer-close:tooltip my-2 is-drawer-close:tooltip-right">
+              <button type="submit" class="btn btn-ghost btn-sm is-drawer-close:btn-square is-drawer-close:justify-center is-drawer-close:tooltip is-drawer-close:tooltip-right w-full is-drawer-open:w-auto" data-tip="Logout">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" />
                 </svg>
-                <span class="is-drawer-close:hidden">Logout</span>
+                
               </button>
             </form>
           </div>
         </div>
       </div>
     </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const drawerToggle = document.getElementById('my-drawer-4');
+        if (window.innerWidth >= 1024) {
+          drawerToggle.checked = true;
+        }
+      });
+    </script>
 </body>
 </html>

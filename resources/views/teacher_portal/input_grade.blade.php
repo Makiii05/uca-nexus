@@ -694,9 +694,12 @@
         }
 
         async function deleteColumn(gradeColumnId) {
-            if (!confirm('Delete this grade column and all raw scores under it?')) {
-                return;
-            }
+            const confirmed = await confirmDialog('Delete this grade column and all raw scores under it?', {
+                title: 'Confirm Delete',
+                confirmText: 'Delete',
+                confirmClass: 'btn-error'
+            });
+            if (!confirmed) return;
 
             try {
                 const response = await fetch(`${deleteGradeColumnApiBase}/${gradeColumnId}`, {

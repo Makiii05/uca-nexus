@@ -64,6 +64,177 @@ class StudentController extends Controller
         return response()->json(['data' => $students]);
     }
 
+    public function exportStudents()
+    {
+        $students = Student::with(['contact', 'guardian', 'academicHistory'])
+            ->where('is_exported', false)
+            ->orderBy('id')
+            ->get();
+
+        if ($students->isEmpty()) {
+            return redirect()->route('admission.student')->with('info', 'No unexported students found.');
+        }
+
+        $headers = [
+            'record_type',
+            'student_number',
+            'student_id',
+            'lrn',
+            'department_id',
+            'program_id',
+            'level_id',
+            'last_name',
+            'first_name',
+            'middle_name',
+            'sex',
+            'citizenship',
+            'religion',
+            'birthdate',
+            'place_of_birth',
+            'civil_status',
+            'student_type',
+            'application_id',
+            'status',
+            'is_exported',
+            'student_created_at',
+            'student_updated_at',
+            'contact_zip_code',
+            'contact_present_address',
+            'contact_permanent_address',
+            'contact_telephone_number',
+            'contact_mobile_number',
+            'contact_email',
+            'contact_created_at',
+            'contact_updated_at',
+            'guardian_mother_name',
+            'guardian_mother_occupation',
+            'guardian_mother_contact_number',
+            'guardian_mother_monthly_income',
+            'guardian_father_name',
+            'guardian_father_occupation',
+            'guardian_father_contact_number',
+            'guardian_father_monthly_income',
+            'guardian_guardian_name',
+            'guardian_guardian_occupation',
+            'guardian_guardian_contact_number',
+            'guardian_guardian_monthly_income',
+            'guardian_created_at',
+            'guardian_updated_at',
+            'academic_elementary_school_name',
+            'academic_elementary_school_address',
+            'academic_elementary_inclusive_years',
+            'academic_junior_school_name',
+            'academic_junior_school_address',
+            'academic_junior_inclusive_years',
+            'academic_senior_school_name',
+            'academic_senior_school_address',
+            'academic_senior_inclusive_years',
+            'academic_college_school_name',
+            'academic_college_school_address',
+            'academic_college_inclusive_years',
+            'academic_created_at',
+            'academic_updated_at',
+        ];
+
+        $rows = [];
+        foreach ($students as $student) {
+            $rows[] = $this->buildCsvRow($headers, [
+                'record_type' => 'student',
+                'student_number' => $student->student_number,
+                'student_id' => $student->id,
+                'lrn' => $student->lrn,
+                'department_id' => $student->department_id,
+                'program_id' => $student->program_id,
+                'level_id' => $student->level_id,
+                'last_name' => $student->last_name,
+                'first_name' => $student->first_name,
+                'middle_name' => $student->middle_name,
+                'sex' => $student->sex,
+                'citizenship' => $student->citizenship,
+                'religion' => $student->religion,
+                'birthdate' => optional($student->birthdate)->format('Y-m-d'),
+                'place_of_birth' => $student->place_of_birth,
+                'civil_status' => $student->civil_status,
+                'student_type' => $student->student_type,
+                'application_id' => $student->application_id,
+                'status' => $student->status,
+                'is_exported' => 1,
+                'student_created_at' => optional($student->created_at)->format('Y-m-d H:i:s'),
+                'student_updated_at' => optional($student->updated_at)->format('Y-m-d H:i:s'),
+            ]);
+
+            if ($student->contact) {
+                $rows[] = $this->buildCsvRow($headers, [
+                    'record_type' => 'contact',
+                    'student_number' => $student->student_number,
+                    'student_id' => $student->id,
+                    'contact_zip_code' => $student->contact->zip_code,
+                    'contact_present_address' => $student->contact->present_address,
+                    'contact_permanent_address' => $student->contact->permanent_address,
+                    'contact_telephone_number' => $student->contact->telephone_number,
+                    'contact_mobile_number' => $student->contact->mobile_number,
+                    'contact_email' => $student->contact->email,
+                    'contact_created_at' => optional($student->contact->created_at)->format('Y-m-d H:i:s'),
+                    'contact_updated_at' => optional($student->contact->updated_at)->format('Y-m-d H:i:s'),
+                ]);
+            }
+
+            if ($student->guardian) {
+                $rows[] = $this->buildCsvRow($headers, [
+                    'record_type' => 'guardian',
+                    'student_number' => $student->student_number,
+                    'student_id' => $student->id,
+                    'guardian_mother_name' => $student->guardian->mother_name,
+                    'guardian_mother_occupation' => $student->guardian->mother_occupation,
+                    'guardian_mother_contact_number' => $student->guardian->mother_contact_number,
+                    'guardian_mother_monthly_income' => $student->guardian->mother_monthly_income,
+                    'guardian_father_name' => $student->guardian->father_name,
+                    'guardian_father_occupation' => $student->guardian->father_occupation,
+                    'guardian_father_contact_number' => $student->guardian->father_contact_number,
+                    'guardian_father_monthly_income' => $student->guardian->father_monthly_income,
+                    'guardian_guardian_name' => $student->guardian->guardian_name,
+                    'guardian_guardian_occupation' => $student->guardian->guardian_occupation,
+                    'guardian_guardian_contact_number' => $student->guardian->guardian_contact_number,
+                    'guardian_guardian_monthly_income' => $student->guardian->guardian_monthly_income,
+                    'guardian_created_at' => optional($student->guardian->created_at)->format('Y-m-d H:i:s'),
+                    'guardian_updated_at' => optional($student->guardian->updated_at)->format('Y-m-d H:i:s'),
+                ]);
+            }
+
+            if ($student->academicHistory) {
+                $rows[] = $this->buildCsvRow($headers, [
+                    'record_type' => 'academic_history',
+                    'student_number' => $student->student_number,
+                    'student_id' => $student->id,
+                    'academic_elementary_school_name' => $student->academicHistory->elementary_school_name,
+                    'academic_elementary_school_address' => $student->academicHistory->elementary_school_address,
+                    'academic_elementary_inclusive_years' => $student->academicHistory->elementary_inclusive_years,
+                    'academic_junior_school_name' => $student->academicHistory->junior_school_name,
+                    'academic_junior_school_address' => $student->academicHistory->junior_school_address,
+                    'academic_junior_inclusive_years' => $student->academicHistory->junior_inclusive_years,
+                    'academic_senior_school_name' => $student->academicHistory->senior_school_name,
+                    'academic_senior_school_address' => $student->academicHistory->senior_school_address,
+                    'academic_senior_inclusive_years' => $student->academicHistory->senior_inclusive_years,
+                    'academic_college_school_name' => $student->academicHistory->college_school_name,
+                    'academic_college_school_address' => $student->academicHistory->college_school_address,
+                    'academic_college_inclusive_years' => $student->academicHistory->college_inclusive_years,
+                    'academic_created_at' => optional($student->academicHistory->created_at)->format('Y-m-d H:i:s'),
+                    'academic_updated_at' => optional($student->academicHistory->updated_at)->format('Y-m-d H:i:s'),
+                ]);
+            }
+        }
+
+        $studentIds = $students->pluck('id');
+        Student::whereIn('id', $studentIds)->update(['is_exported' => true]);
+
+        $csv = $this->buildCsvString($headers, $rows);
+        $filename = 'students_export_' . now()->format('Ymd_His') . '.csv';
+
+        return response()->streamDownload(function () use ($csv) {
+            echo $csv;
+        }, $filename, ['Content-Type' => 'text/csv']);
+    }
+
     public function editStudent(Request $request, $id)
     {
         $student = Student::with(['department', 'program', 'level', 'contact', 'guardian', 'academicHistory'])
@@ -173,6 +344,31 @@ class StudentController extends Controller
         $redirectRoute = str_contains($prefix, 'department') ? 'department.student' : 'admission.student';
         
         return redirect()->route($redirectRoute)->with('success', 'Student updated successfully.');
+    }
+
+    private function buildCsvString(array $headers, array $rows): string
+    {
+        $handle = fopen('php://temp', 'r+');
+        fputcsv($handle, $headers);
+
+        foreach ($rows as $row) {
+            fputcsv($handle, $row);
+        }
+
+        rewind($handle);
+        $csv = stream_get_contents($handle);
+        fclose($handle);
+
+        return $csv ?: '';
+    }
+
+    private function buildCsvRow(array $headers, array $data): array
+    {
+        $row = [];
+        foreach ($headers as $header) {
+            $row[] = $data[$header] ?? '';
+        }
+        return $row;
     }
 
     /**

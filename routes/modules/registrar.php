@@ -102,6 +102,7 @@ Route::prefix('registrar')->name('registrar.')->group(function () {
         // API routes for dynamic loading
         Route::get('/students', [RegistrarStudentController::class, 'showStudents'])->name('student');
         Route::get('/api/students/search', [RegistrarStudentController::class, 'searchStudents'])->name('api.students.search');
+        Route::post('/students/import', [RegistrarStudentController::class, 'importStudents'])->name('students.import');
         Route::get('/students/{id}/assessment', [RegistrarStudentController::class, 'showAssessment'])->name('student.assessment');
         Route::get('/students/{id}/print-assessment', [PdfController::class, 'printStudentAssessment'])->name('student.print-assessment');
         Route::post('/students/{id}/update-level', [RegistrarStudentController::class, 'updateLevel'])->name('student.update-level');

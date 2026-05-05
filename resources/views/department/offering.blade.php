@@ -72,6 +72,7 @@
                                                         <th>Code</th>
                                                         <th>Description</th>
                                                         <th>Unit</th>
+                                                        <th></th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -81,6 +82,11 @@
                                                         <td>{{ $prospectus->subject->code }}</td>
                                                         <td>{{ $prospectus->subject->description }}</td>
                                                         <td>{{ $prospectus->subject->unit }}</td>
+                                                        <td class="w-10 text-center">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                                            </svg>   
+                                                        </td>
                                                     </tr>
                                                     @endforeach
                                                 </tbody>
@@ -118,6 +124,7 @@
                                 <th>Code</th>
                                 <th>Description</th>
                                 <th>Unit</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody id="subjectSearchResults">
@@ -437,7 +444,12 @@
 
     // Remove subject offering
     async function removeOffering(offeringId) {
-        if (!confirm('Remove this subject from offerings?')) return;
+        const confirmed = await confirmDialog('Remove this subject from offerings?', {
+            title: 'Confirm Removal',
+            confirmText: 'Remove',
+            confirmClass: 'btn-error'
+        });
+        if (!confirmed) return;
 
         try {
             const response = await fetch(`${removeSubjectOfferingUrl}/${offeringId}/remove`, {
@@ -582,6 +594,11 @@
                             <td>${subject.code}</td>
                             <td>${subject.description}</td>
                             <td>${subject.unit}</td>
+                            <td class="w-10 text-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                                </svg>   
+                            </td>
                         `;
                         tbody.appendChild(row);
                     });

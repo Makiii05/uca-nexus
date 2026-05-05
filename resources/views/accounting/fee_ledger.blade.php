@@ -2,10 +2,15 @@
 
     @include('partials.notifications')
 
+    @php
+        $backProgramId = request('program', $fee->program_id);
+        $backAcademicTermId = request('academic_term_id', $fee->academic_term_id);
+    @endphp
+
     <div class="m-4">
         <div class="flex items-center justify-between mb-6">
             <div class="flex items-center gap-4">
-                <a href="{{ route('accounting.fee') }}" class="btn btn-ghost btn-sm">
+                <a href="{{ route('accounting.fee.search', ['program' => $backProgramId, 'academic_term_id' => $backAcademicTermId]) }}" class="btn btn-ghost btn-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
                     Back
                 </a>

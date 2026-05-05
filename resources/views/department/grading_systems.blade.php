@@ -94,7 +94,7 @@
                                 >
                                     edit
                                 </button>
-                                <form action="{{ route('department.grading_systems.delete', $gradingSystem->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this grading system?')">
+                                <form action="{{ route('department.grading_systems.delete', $gradingSystem->id) }}" method="POST" style="display:inline;" onsubmit="return confirmDelete(this, 'Are you sure you want to delete this grading system?')">
                                     @csrf
                                     <button type="submit" class="text-red-600 hover:underline">delete</button>
                                 </form>

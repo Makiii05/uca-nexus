@@ -28,10 +28,12 @@ class Student extends Model
         'application_id',
         'status',
         'student_type',
+        'is_exported',
     ];
 
     protected $casts = [
         'birthdate' => 'date',
+        'is_exported' => 'boolean',
     ];
 
     // Relationships

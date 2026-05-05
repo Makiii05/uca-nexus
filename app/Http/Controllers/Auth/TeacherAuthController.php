@@ -182,6 +182,136 @@ class TeacherAuthController extends Controller
         ]);
     }
 
+    public function showChangePassword()
+    {
+        $teacher = $this->getLoggedInTeacher();
+        if (!$teacher) {
+            return redirect()->route('teacher_portal.login');
+        }
+        return view('teacher_portal.change_password', compact('teacher'));
+    }
+
+    public function changePassword(Request $request)
+    {
+        $teacher = $this->getLoggedInTeacher();
+        if (!$teacher) {
+            return redirect()->route('teacher_portal.login');
+        }
+
+        $validated = $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string|min:6|confirmed',
+        ]);
+
+        $account = $teacher->account;
+        if (!$account) {
+            return redirect()->route('teacher_portal.change_password')->withErrors(['current_password' => 'No account found for this teacher.']);
+        }
+
+        if (!\Illuminate\Support\Facades\Hash::check($validated['current_password'], $account->password)) {
+            throw ValidationException::withMessages([
+                'current_password' => 'Current password is incorrect.',
+            ]);
+        }
+
+        $account->password = $validated['new_password'];
+        $account->save();
+
+        return redirect()->route('teacher_portal.change_password')
+            ->with('success', 'Password changed successfully.');
+    }
+
+    public function showClassList()
+    {
+        $teacher = $this->getLoggedInTeacher();
+        if (!$teacher) {
+            return redirect()->route('teacher_portal.login');
+        }
+
+        $departmentIds = TeacherOffering::query()
+            ->where('teacher_id', $teacher->id)
+            ->join('subject_offerings', 'teacher_offerings.offering_id', '=', 'subject_offerings.id')
+            ->whereNotNull('subject_offerings.department_id')
+            ->select('subject_offerings.department_id')
+            ->distinct()
+            ->pluck('subject_offerings.department_id');
+
+        $academicTerms = collect();
+        if ($departmentIds->isNotEmpty()) {
+            $academicTerms = AcademicTerm::query()
+                ->where('status', 'active')
+                ->whereIn('department_id', $departmentIds)
+                ->orderBy('created_at')
+                ->get();
+        }
+
+        return view('teacher_portal.class_list', [
+            'teacher' => $teacher,
+            'academicTerms' => $academicTerms,
+        ]);
+    }
+
+    public function getSubjectOfferings(Request $request, $academicTermId)
+    {
+        $teacher = $this->getLoggedInTeacher();
+        if (!$teacher) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $offerings = TeacherOffering::query()
+            ->where('teacher_id', $teacher->id)
+            ->where('academic_term_id', $academicTermId)
+            ->with(['offering.subject', 'offering.program', 'offering.level'])
+            ->orderBy('created_at')
+            ->get()
+            ->map(function ($to) {
+                return [
+                    'id' => $to->id,
+                    'offering_id' => $to->offering_id,
+                    'code' => $to->offering->code ?? '',
+                    'subject_name' => $to->offering->subject?->name ?? '',
+                    'program_name' => $to->offering->program?->name ?? '',
+                    'level_name' => $to->offering->level?->name ?? '',
+                ];
+            });
+
+        return response()->json(['offerings' => $offerings]);
+    }
+
+    public function getClassList(Request $request, $teacherOfferingId)
+    {
+        $teacher = $this->getLoggedInTeacher();
+        if (!$teacher) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $teacherOffering = TeacherOffering::query()
+            ->where('id', $teacherOfferingId)
+            ->where('teacher_id', $teacher->id)
+            ->firstOrFail();
+
+        $studentIds = Enlistment::query()
+            ->where('subject_offering_id', $teacherOffering->offering_id)
+            ->where('academic_term_id', $teacherOffering->academic_term_id)
+            ->pluck('student_id')
+            ->unique()
+            ->values();
+
+        $students = \App\Models\Student::query()
+            ->whereIn('id', $studentIds)
+            ->get()
+            ->map(function ($s) {
+                $name = trim($s->last_name . ', ' . $s->first_name . ' ' . ($s->middle_name ? substr($s->middle_name, 0, 1) . '.' : ''));
+                return [
+                    'id' => $s->id,
+                    'student_number' => $s->student_number,
+                    'student_name' => $name,
+                ];
+            })->values();
+
+        return response()->json(['students' => $students]);
+    }
+
     public function showInputGrade($teacherOfferingId)
     {
         $teacher = $this->getLoggedInTeacher();

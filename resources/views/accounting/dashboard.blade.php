@@ -8,11 +8,11 @@
         <h2>Dashboard</h2>
     </div>
 
-    <div class="m-4 grid grid-cols-1 gap-6">
+    <div class="m-4 grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
         <!-- Student Portal Status Toggle -->
-        <div class="card bg-white shadow-lg">
-            <div class="card-body">
-                <div class="flex items-center justify-between">
+        <div class="card bg-white shadow-lg h-full">
+            <div class="card-body h-full">
+                <div class="flex flex-col gap-3 justify-between">
                     <div>
                         <h2 class="text-lg font-semibold text-gray-800">Student Portal Status</h2>
                         <p class="text-sm text-gray-500">Toggle to enable or disable student portal access</p>
@@ -32,9 +32,9 @@
         </div>
 
         <!-- Deactivate Students Accounts Widget -->
-        <div class="card bg-white shadow-lg">
-            <div class="card-body">
-                <div class="flex items-center justify-between">
+        <div class="card bg-white shadow-lg h-full">
+            <div class="card-body h-full">
+                <div class="flex flex-col gap-3 justify-between">
                     <div>
                         <h2 class="text-lg font-semibold text-gray-800">Deactivate All Student Accounts</h2>
                         <p class="text-sm text-gray-500">Deactivate all student accounts at once. This action requires password verification.</p>
@@ -49,9 +49,9 @@
         </div>
 
         <!-- Clear All Examination Permits Widget -->
-        <div class="card bg-white shadow-lg">
-            <div class="card-body">
-                <div class="flex items-center justify-between">
+        <div class="card bg-white shadow-lg h-full">
+            <div class="card-body h-full">
+                <div class="flex flex-col gap-3 justify-between">
                     <div>
                         <h2 class="text-lg font-semibold text-gray-800">Clear All Examination Permits</h2>
                         <p class="text-sm text-gray-500">Clear all examination permits at once. This action requires password verification.</p>

@@ -2,9 +2,6 @@
 
     @include('partials.notifications')
 
-    <!-- Toast notification container -->
-    <div id="toastContainer" class="fixed top-4 right-4 z-50 flex flex-col gap-2"></div>
-
     <div class="flex items-center gap-4 mb-4">
         <a href="{{ route('department.enlistment', ['academic_term_id' => $academicTerm->id]) }}" class="btn btn-ghost btn-sm">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
@@ -110,19 +107,6 @@
     const studentId = {{ $student->id }};
     const academicTermId = {{ $academicTerm->id }};
     const csrfToken = '{{ csrf_token() }}';
-
-    // Toast notification function
-    function showToast(message, type = 'info') {
-        const container = document.getElementById('toastContainer');
-        const toast = document.createElement('div');
-        const textColor = type === 'success' ? 'text-green-600' : type === 'error' ? 'text-red-600' : 'text-gray-600';
-        toast.className = `bg-white border shadow-lg rounded-lg px-4 py-3 ${textColor} text-sm`;
-        toast.textContent = message;
-        container.appendChild(toast);
-        setTimeout(() => {
-            toast.remove();
-        }, 3000);
-    }
 
     // Update status and level
     document.getElementById('submitUpdate').addEventListener('click', function(event) {
@@ -302,26 +286,30 @@
 
     // Remove enlistment
     function removeEnlistment(id) {
-        if (!confirm('Are you sure you want to remove this subject?')) return;
-
-        fetch(`{{ url('department/api/enlistment') }}/${id}/remove`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': csrfToken
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                loadEnlistments();
-                showToast('Subject removed.', 'success');
-            } else {
-                showToast(data.message || 'Failed to remove subject.', 'error');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showToast('Error removing subject.', 'error');
+        confirmAction('Are you sure you want to remove this subject?', () => {
+            fetch(`{{ url('department/api/enlistment') }}/${id}/remove`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    loadEnlistments();
+                    showToast('Subject removed.', 'success');
+                } else {
+                    showToast(data.message || 'Failed to remove subject.', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Error removing subject.', 'error');
+            });
+        }, {
+            title: 'Confirm Removal',
+            confirmText: 'Remove',
+            confirmClass: 'btn-error'
         });
     }
 

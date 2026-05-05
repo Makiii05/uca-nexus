@@ -65,7 +65,7 @@
                             <td class="text-end whitespace-nowrap">{{ $fee->amount }}</td>
                             <td class="whitespace-nowrap">
                                 <button class="btn btn-sm btn-ghost" onclick="edit_major_modal_{{ $fee->id }}.showModal()">Edit</button>
-                                <a href="{{ route('accounting.fee.ledger', $fee->id) }}" class="btn btn-sm btn-ghost text-blue-600">Ledger</a>
+                                <a href="{{ route('accounting.fee.ledger', ['id' => $fee->id, 'program' => $old_program, 'academic_term_id' => $old_academic_term_id]) }}" class="btn btn-sm btn-ghost text-blue-600">Ledger</a>
                                 <form action="{{ route('accounting.fee.delete', $fee->id) }}" method="POST" style="display: inline;" onsubmit="return confirmDelete(this, 'Are you sure you want to delete this fee?')">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-ghost text-red-500">Delete</button>
@@ -132,7 +132,7 @@
                             <td class="text-end whitespace-nowrap">{{ $fee->amount }}</td>
                             <td class="whitespace-nowrap">
                                 <button class="btn btn-sm btn-ghost" onclick="edit_other_modal_{{ $fee->id }}.showModal()">Edit</button>
-                                <a href="{{ route('accounting.fee.ledger', $fee->id) }}" class="btn btn-sm btn-ghost text-blue-600">Ledger</a>
+                                <a href="{{ route('accounting.fee.ledger', ['id' => $fee->id, 'program' => $old_program, 'academic_term_id' => $old_academic_term_id]) }}" class="btn btn-sm btn-ghost text-blue-600">Ledger</a>
                                 <form action="{{ route('accounting.fee.delete', $fee->id) }}" method="POST" style="display: inline;" onsubmit="return confirmDelete(this, 'Are you sure you want to delete this fee?')">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-ghost text-red-500">Delete</button>
@@ -206,7 +206,7 @@
                             <td class="text-end whitespace-nowrap">{{ $fee->amount }}</td>
                             <td class="whitespace-nowrap">
                                 <button class="btn btn-sm btn-ghost" onclick="edit_additional_modal_{{ $fee->id }}.showModal()">Edit</button>
-                                <a href="{{ route('accounting.fee.ledger', $fee->id) }}" class="btn btn-sm btn-ghost text-blue-600">Ledger</a>
+                                <a href="{{ route('accounting.fee.ledger', ['id' => $fee->id, 'program' => $old_program, 'academic_term_id' => $old_academic_term_id]) }}" class="btn btn-sm btn-ghost text-blue-600">Ledger</a>
                                 <form action="{{ route('accounting.fee.delete', $fee->id) }}" method="POST" style="display: inline;" onsubmit="return confirmDelete(this, 'Are you sure you want to delete this fee?')">
                                     @csrf
                                     <button type="submit" class="btn btn-sm btn-ghost text-red-500">Delete</button>

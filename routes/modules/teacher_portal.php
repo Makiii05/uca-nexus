@@ -25,11 +25,20 @@ Route::prefix('teacher-portal')->name('teacher_portal.')->group(function () {
         // Subject Load
         Route::get('/subject-load', [TeacherAuthController::class, 'showSubjectLoad'])->name('subject_load');
 
+        // Change Password
+        Route::get('/change-password', [TeacherAuthController::class, 'showChangePassword'])->name('change_password');
+        Route::post('/change-password', [TeacherAuthController::class, 'changePassword'])->name('change_password.submit');
+
+        // Class List
+        Route::get('/class-list', [TeacherAuthController::class, 'showClassList'])->name('class_list');
+
         // Input Grade
         Route::get('/input-grade/{teacherOfferingId}', [TeacherAuthController::class, 'showInputGrade'])->name('input_grade');
 
         // API routes for dynamic loading
         Route::get('/api/student-grades/{teacherOfferingId}', [TeacherAuthController::class, 'getStudentGrades'])->name('api.student_grades');
+        Route::get('/api/subject-offerings/{academicTermId}', [TeacherAuthController::class, 'getSubjectOfferings'])->name('api.subject_offerings');
+        Route::get('/api/class-list/{teacherOfferingId}', [TeacherAuthController::class, 'getClassList'])->name('api.class_list');
         Route::get('/api/component-columns/{teacherOfferingId}', [TeacherAuthController::class, 'getComponentColumns'])->name('api.component_columns');
         Route::patch('/api/grade-column/{gradeColumnId}/highest-score', [GradeController::class, 'updateHighestScore'])->name('api.grade_column.highest_score');
         Route::post('/api/grade-column/{teacherOfferingId}', [GradeController::class, 'storeGradeColumn'])->name('api.grade_column.store');

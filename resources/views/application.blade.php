@@ -1,4 +1,5 @@
 <x-layout>
+    @include('partials.notifications', ['suppressSuccessToast' => true])
     @include('partials.success-notification')
     @include('partials.consent-modal')
     <div class="w-full max-w-7xl mx-auto p-4 sm:p-6">

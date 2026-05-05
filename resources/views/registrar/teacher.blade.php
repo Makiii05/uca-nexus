@@ -43,7 +43,7 @@
                             <td>
                                 <button class="text-green-600 hover:underline" onclick='openTeacherEditModal(@json($teacher))'>edit</button>
 
-                                <form action="{{ route('registrar.teacher.toggle-account', $teacher->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to change this teacher\'s portal account status?')">
+                                <form action="{{ route('registrar.teacher.toggle-account', $teacher->id) }}" method="POST" style="display:inline;" onsubmit="return confirmSubmit(this, 'Are you sure you want to change this teacher\'s portal account status?')">
                                     @csrf
                                     @if(($teacher->account?->status ?? 'off') === 'on')
                                         <button type="submit" class="text-orange-600 hover:underline">close account</button>

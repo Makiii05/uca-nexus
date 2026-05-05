@@ -6,8 +6,9 @@
     @include('partials.student-guardian-modal')
     @include('partials.student-academic-history-modal')
 
-    <div class="flex items-center gap-4 mb-4">
-        <h2 class="font-bold text-4xl flex-1">Students</h2>
+    <div class="flex items-center justify-between gap-4 mb-4">
+        <h2 class="font-bold text-4xl">Students</h2>
+        <a href="{{ route('admission.students.export') }}" class="btn btn-success">Export CSV</a>
     </div>
     
       <!-- Search Section -->

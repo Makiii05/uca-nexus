@@ -52,6 +52,7 @@ Route::prefix('admission')->name('admission.')->group(function () {
         Route::post('/evaluation/admit', [AdmissionProcessController::class, 'admitStudents'])->name('evaluation.admit');
         
         Route::get('/student', [StudentController::class, 'showStudent'])->name('student');
+        Route::get('/students/export', [StudentController::class, 'exportStudents'])->name('students.export');
         Route::get('/api/students/search', [StudentController::class, 'searchStudents'])->name('api.students.search');
         Route::get('/student/{id}/edit', [StudentController::class, 'editStudent'])->name('student.edit');
         Route::post('/student/{id}/update', [StudentController::class, 'updateStudent'])->name('student.update');

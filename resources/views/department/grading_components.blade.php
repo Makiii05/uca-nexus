@@ -64,7 +64,7 @@
                                 >
                                     edit
                                 </button>
-                                <form action="{{ route('department.grading_components.delete', $component->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this component?')">
+                                <form action="{{ route('department.grading_components.delete', $component->id) }}" method="POST" style="display:inline;" onsubmit="return confirmDelete(this, 'Are you sure you want to delete this component?')">
                                     @csrf
                                     <button type="submit" class="text-red-600 hover:underline">delete</button>
                                 </form>

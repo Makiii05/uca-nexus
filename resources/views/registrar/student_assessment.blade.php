@@ -609,7 +609,12 @@
 
         // ── Remove Fee ───────────────────────────────────────
         async function removeFee(studentFeeId) {
-            if (!confirm('Remove this fee?')) return;
+            const confirmed = await confirmDialog('Remove this fee?', {
+                title: 'Confirm Removal',
+                confirmText: 'Remove',
+                confirmClass: 'btn-error'
+            });
+            if (!confirmed) return;
 
             try {
                 const response = await fetch(`${removeFeeApiUrl}/${studentFeeId}`, {
@@ -891,7 +896,12 @@
         }
 
         async function deleteAssessmentHistory(historyId) {
-            if (!confirm('Are you sure you want to delete this assessment history record?')) return;
+            const confirmed = await confirmDialog('Are you sure you want to delete this assessment history record?', {
+                title: 'Confirm Delete',
+                confirmText: 'Delete',
+                confirmClass: 'btn-error'
+            });
+            if (!confirmed) return;
 
             try {
                 const response = await fetch(`${assessmentHistoriesApiUrl}/${historyId}`, {

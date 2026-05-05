@@ -1,10 +1,14 @@
 <x-registrar_sidebar>
 
-    <div class="m-4 font-bold text-4xl">
-        <h2>Students</h2>
+    <div class="m-4 flex items-center justify-between gap-4">
+        <h2 class="font-bold text-4xl">Students</h2>
+        <button type="button" class="btn btn-success" onclick="document.getElementById('import_students_modal').showModal();">
+            Import CSV
+        </button>
     </div>
 
     @include('partials.notifications')
+    @include('partials.import-students-modal')
 
     <!-- Search Section -->
     <div class="flex justify-end gap-2 mb-4 px-4">

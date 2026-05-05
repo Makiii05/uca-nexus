@@ -563,7 +563,12 @@
         };
 
         async function deleteTransaction(id) {
-            if (!confirm('Are you sure you want to delete this transaction?')) return;
+            const confirmed = await confirmDialog('Are you sure you want to delete this transaction?', {
+                title: 'Confirm Delete',
+                confirmText: 'Delete',
+                confirmClass: 'btn-error'
+            });
+            if (!confirmed) return;
 
             try {
                 const response = await fetch(`${transactionsApiUrl}/${id}`, {
@@ -687,9 +692,12 @@
                 return;
             }
 
-            if (!confirm('Are you sure you want to clear the examination permit?')) {
-                return;
-            }
+            const confirmed = await confirmDialog('Are you sure you want to clear the examination permit?', {
+                title: 'Confirm Clear',
+                confirmText: 'Clear',
+                confirmClass: 'btn-warning'
+            });
+            if (!confirmed) return;
 
             const btn = document.getElementById('clearPermitBtn');
             const btnText = document.getElementById('clearPermitText');

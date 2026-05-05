@@ -8,6 +8,7 @@ use App\Http\Controllers\DepartmentGradingSystemController;
 use App\Http\Controllers\SubjectOfferingController;
 use App\Http\Controllers\TeacherOfferingController;
 use App\Http\Controllers\EnlistmentController;
+use App\Http\Controllers\DepartmentGradeReportController;
 use App\Http\Controllers\PdfController;
 
 /*
@@ -70,5 +71,12 @@ Route::prefix('department')->name('department.')->group(function () {
         Route::get('/teacher-loading', [TeacherOfferingController::class, 'showTeacherLoading'])->name('teacher_loading');
         Route::post('/teacher-loading/assign', [TeacherOfferingController::class, 'createTeacherOffering'])->name('teacher_loading.assign');
         Route::get('/teacher-loading/teachers/{teacherId}/subjects', [TeacherOfferingController::class, 'showTeacherSubjects'])->name('teacher_loading.subjects');
+
+        // Grade Report
+        Route::get('/grade-report', [DepartmentGradeReportController::class, 'index'])->name('grade_report');
+        Route::get('/grade-report/students/{studentId}/view', [DepartmentGradeReportController::class, 'view'])->name('grade_report.view');
+        Route::get('/api/grade-report/academic-terms', [DepartmentGradeReportController::class, 'getAcademicTerms'])->name('api.grade_report.academic_terms');
+        Route::get('/api/grade-report/subject-offerings', [DepartmentGradeReportController::class, 'getSubjectOfferings'])->name('api.grade_report.subject_offerings');
+        Route::get('/api/grade-report/periods', [DepartmentGradeReportController::class, 'getPeriods'])->name('api.grade_report.periods');
     });
 });
