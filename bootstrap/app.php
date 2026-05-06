@@ -4,6 +4,7 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -54,15 +55,44 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions): void {
         // Handle 419 Page Expired (CSRF token mismatch)
         $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, Request $request) {
-            // Redirect back to the previous page or login with a message
-            $referer = $request->headers->get('referer');
-            
-            if ($referer) {
-                return redirect($referer)
-                    ->withInput($request->except('password', '_token'))
-                    ->withErrors(['session' => 'Your session has expired. Please try again.']);
+            $routeMap = [
+                'accounting/*' => 'accounting.login',
+                'registrar/*' => 'registrar.login',
+                'admission/*' => 'admission.login',
+                'department/*' => 'department.login',
+                'admin/*' => 'admin.login',
+                'student-portal/*' => 'student_portal.login',
+                'teacher-portal/*' => 'teacher_portal.login',
+            ];
+
+            $resolveLoginRoute = function (?string $path) use ($routeMap): ?string {
+                if (!$path) {
+                    return null;
+                }
+
+                $normalizedPath = ltrim($path, '/');
+
+                foreach ($routeMap as $pattern => $routeName) {
+                    if (Str::is($pattern, $normalizedPath)) {
+                        return $routeName;
+                    }
+                }
+
+                return null;
+            };
+
+            $routeName = $resolveLoginRoute($request->path());
+
+            if (!$routeName) {
+                $refererPath = parse_url((string) $request->headers->get('referer'), PHP_URL_PATH);
+                $routeName = $resolveLoginRoute(is_string($refererPath) ? $refererPath : null);
             }
-            
+
+            if ($routeName) {
+                return redirect()->route($routeName)
+                    ->withErrors(['session' => 'Your session has expired. Please log in again.']);
+            }
+
             return redirect()->route('index')
                 ->withErrors(['session' => 'Your session has expired. Please try again.']);
         });

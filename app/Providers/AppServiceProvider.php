@@ -21,7 +21,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         //
-        URL::forceScheme('http');
+        if (config('app.env') === 'production') {
+            URL::forceScheme('https');
+        }else {
+            URL::forceScheme('http');
+        }
 
         Gate::define('access-admin', fn($user) => $user->type === 'admin');
         Gate::define('access-registrar', fn($user) => $user->type === 'registrar');
