@@ -44,16 +44,12 @@
                     <a href="#about" class="nav-link text-gray-700 hover:text-blue-800 font-medium transition-colors">About</a>
                     <a href="#programs" class="nav-link text-gray-700 hover:text-blue-800 font-medium transition-colors">Programs</a>
                     <a href="#contact" class="nav-link text-gray-700 hover:text-blue-800 font-medium transition-colors">Contact</a>
-                    <a href="{{ route('navigate') }}" class="text-gray-700 hover:text-blue-800 font-medium transition-colors">Portal</a>
                 </nav>
 
                 <!-- Apply Now Button -->
                 <div class="flex items-center gap-4">
                     <a href="{{ route('applicant.form') }}" class="hidden sm:inline-flex px-6 py-2.5 bg-blue-800 hover:bg-blue-900 text-white font-semibold rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                         Apply Now
-                    </a>
-                    <a href="{{ route('navigate') }}" class="hidden sm:inline-flex px-6 py-2.5 border border-blue-800 hover:bg-blue-900 hover:text-white font-semibold rounded-full transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                        Portals
                     </a>
                     <!-- Mobile Menu Button -->
                     <button id="mobileMenuBtn" class="md:hidden p-2 text-gray-700 hover:text-blue-800">
@@ -72,7 +68,6 @@
                     <a href="#about" class="px-4 py-2 text-gray-700 hover:bg-blue-50 rounded-lg">About</a>
                     <a href="#programs" class="px-4 py-2 text-gray-700 hover:bg-blue-50 rounded-lg">Programs</a>
                     <a href="#contact" class="px-4 py-2 text-gray-700 hover:bg-blue-50 rounded-lg">Contact</a>
-                    <a href="{{ route('navigate') }}" class="px-4 py-2 text-gray-700 hover:bg-blue-50 rounded-lg">Portal</a>
                     <a href="{{ route('applicant.form') }}" class="mx-4 mt-2 px-4 py-2 bg-blue-800 text-white text-center rounded-full">Apply Now</a>
                 </nav>
             </div>
@@ -416,7 +411,6 @@
                         <a href="#about" class="block text-blue-200 hover:text-white transition-colors">About Us</a>
                         <a href="#programs" class="block text-blue-200 hover:text-white transition-colors">Programs</a>
                         <a href="#location" class="block text-blue-200 hover:text-white transition-colors">Location</a>
-                        <a href="{{ route('navigate') }}" class="block text-blue-200 hover:text-white transition-colors">Portal Login</a>
                     </nav>
                 </div>
 
