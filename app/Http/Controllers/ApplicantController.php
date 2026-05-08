@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Models\Level;
 use App\Models\Program;
 use App\Models\Applicant;
@@ -24,6 +25,7 @@ class ApplicantController extends Controller
         $college_programs = Program::whereHas('department', function($query){
             $query->where('description', 'like', '%College%');
         })->get();
+        $academicYears = DashboardController::getAcademicYearOptions();
         $currentAcademicYear = AcademicYear::getActiveYearLabel()
             ?? AcademicYear::orderByDesc('start_year')->orderByDesc('id')->first()?->label;
 
@@ -31,21 +33,29 @@ class ApplicantController extends Controller
             'levels' => $levels,
             'strands' => $strands,
             'college_programs' => $college_programs,
+            'academicYears' => $academicYears,
             'currentAcademicYear' => $currentAcademicYear,
         ]);
     }
     
     public function createApplication(Request $request){
+        $academicYears = DashboardController::getAcademicYearOptions();
+        $academicYearOptions = $academicYears->pluck('label')->filter()->values()->all();
+
         // Validate the request
         $validated = $request->validate([
             "application_no" => "required|unique:applicants,application_no",
+            "academic_year" => array_filter([
+                'required',
+                $academicYearOptions ? Rule::in($academicYearOptions) : null,
+            ]),
             "level" => "required",
             "student_type" => "required",
             "year_level" => "nullable",
-            "strand" => "nullable",
-            "first_program_choice" => "nullable",
-            "second_program_choice" => "nullable",
-            "third_program_choice" => "nullable",
+            "strand_id" => "nullable|exists:programs,id",
+            "first_program_choice_id" => "nullable|exists:programs,id",
+            "second_program_choice_id" => "nullable|exists:programs,id",
+            "third_program_choice_id" => "nullable|exists:programs,id",
             "last_name" => "required",
             "first_name" => "required",
             "middle_name" => "required",
@@ -86,7 +96,6 @@ class ApplicantController extends Controller
             "college_school_name" => "required",
             "college_school_address" => "required",
             "college_inclusive_years" => "required",
-            "lrn" => "required|integer",
         ]);
 
         $academicYearLabel = AcademicYear::getActiveYearLabel()
@@ -99,7 +108,7 @@ class ApplicantController extends Controller
         }
 
         $payload = $request->except(['email_confirmation']);
-        $payload['academic_year'] = $academicYearLabel;
+        $payload['academic_year'] = $validated['academic_year'] ?? $academicYearLabel;
         
         // Check if applicant with this email already exists
         $existingApplicant = Applicant::where('email', $validated['email'])->first();
@@ -155,7 +164,6 @@ class ApplicantController extends Controller
                   ->orWhere('status', 'like', "%{$search}%")
                   ->orWhere('level', 'like', "%{$search}%")
                   ->orWhere('student_type', 'like', "%{$search}%")
-                  ->orWhere('lrn', 'like', "%{$search}%")
                   ->orWhere('sex', 'like', "%{$search}%")
                   ->orWhere('citizenship', 'like', "%{$search}%")
                   ->orWhere('religion', 'like', "%{$search}%")
@@ -225,7 +233,6 @@ class ApplicantController extends Controller
                   ->orWhere('status', 'like', "%{$search}%")
                   ->orWhere('level', 'like', "%{$search}%")
                   ->orWhere('student_type', 'like', "%{$search}%")
-                  ->orWhere('lrn', 'like', "%{$search}%")
                   ->orWhere('sex', 'like', "%{$search}%")
                   ->orWhere('citizenship', 'like', "%{$search}%")
                   ->orWhere('religion', 'like', "%{$search}%")
@@ -292,10 +299,10 @@ class ApplicantController extends Controller
             "level" => "nullable",
             "student_type" => "nullable",
             "year_level" => "nullable",
-            "strand" => "nullable",
-            "first_program_choice" => "nullable",
-            "second_program_choice" => "nullable",
-            "third_program_choice" => "nullable",
+            "strand" => "nullable|exists:programs,id",
+            "first_program_choice" => "nullable|exists:programs,id",
+            "second_program_choice" => "nullable|exists:programs,id",
+            "third_program_choice" => "nullable|exists:programs,id",
             "last_name" => "required",
             "first_name" => "required",
             "middle_name" => "nullable",
@@ -335,7 +342,6 @@ class ApplicantController extends Controller
             "college_school_name" => "nullable",
             "college_school_address" => "nullable",
             "college_inclusive_years" => "nullable",
-            "lrn" => "nullable|integer",
         ]);
 
         $applicant->update($validated);

@@ -1,7 +1,7 @@
-<x-registrar_sidebar>
+<x-accounting_sidebar>
 
     <div class="m-4 flex items-center justify-between gap-4">
-        <h2 class="font-bold text-4xl">Students</h2>
+        <h2 class="font-bold text-4xl">Assessments</h2>
         <button type="button" class="btn btn-success" onclick="document.getElementById('import_students_modal').showModal();">
             Import CSV
         </button>
@@ -64,7 +64,7 @@
 
             tableBody.innerHTML = '<tr><td colspan="6" class="text-center text-gray-500 py-8">Searching...</td></tr>';
 
-            fetch(`{{ route('registrar.api.students.search') }}?search=${encodeURIComponent(searchTerm)}`)
+            fetch(`{{ route('accounting.api.assessment.search') }}?search=${encodeURIComponent(searchTerm)}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.data.length === 0) {
@@ -80,7 +80,7 @@
                             <td>${student.program?.code || '-'}</td>
                             <td>${student.level?.description || '-'}</td>
                             <td>
-                                <a href="/registrar/students/${student.id}/assessment" class="btn btn-sm btn-ghost text-primary font-semibold">View</a>
+                                <a href="/accounting/assessments/${student.id}/details" class="btn btn-sm btn-ghost text-primary font-semibold">View</a>
                             </td>
                         </tr>
                     `).join('');
@@ -102,4 +102,4 @@
 
     @include('partials.table-sort-search')
 
-</x-registrar_sidebar>
+</x-accounting_sidebar>

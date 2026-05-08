@@ -112,6 +112,16 @@
 </head>
 <body>
     @foreach($applicants as $applicant)
+    @php
+        $admission = $applicant->admission;
+        $examScores = collect([
+            $admission?->math_score,
+            $admission?->science_score,
+            $admission?->english_score,
+            $admission?->filipino_score,
+            $admission?->abstract_score,
+        ])->filter(fn ($score) => $score !== null && $score !== '');
+    @endphp
     <p class="print-date">Printed: {{ date('F d, Y') }}</p>
     
     <!-- Header -->
@@ -137,15 +147,59 @@
                 <p class="value">{{ ucfirst($applicant->status ?? '—') }}</p>
             </div>
             <div class="field">
-                <p class="label">LRN</p>
-                <p class="value">{{ $applicant->lrn ?? '—' }}</p>
+
             </div>
         </div>
     </div>
 
+    <!-- Admission Progress -->
+    <div class="section">
+        <div class="section-title">II. ADMISSION PROGRESS</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Stage</th>
+                    <th>Score</th>
+                    <th>Result / Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Interview</td>
+                    <td>{{ $admission?->interview_score ?? '—' }}</td>
+                    <td>{{ $admission?->interview_remark ?? $admission?->interview_result ?? '—' }}</td>
+                </tr>
+                <tr>
+                    <td>Examination</td>
+                    <td>
+                        {{ $examScores->isNotEmpty() ? $examScores->join(' / ') : ($admission?->exam_score ?? '—') }}
+                    </td>
+                    <td>{{ $admission?->exam_result ?? '—' }}</td>
+                </tr>
+                <tr>
+                    <td>Final Evaluation</td>
+                    <td>{{ $admission?->final_score ?? '—' }}</td>
+                    <td>{{ $admission?->decision ?? '—' }}</td>
+                </tr>
+                <tr>
+                    <td>Program</td>
+                    <td colspan="2">{{ $admission?->program?->description ?? '—' }}</td>
+                </tr>
+                <tr>
+                    <td>Evaluated By</td>
+                    <td colspan="2">{{ $admission?->evaluated_by ?? '—' }}</td>
+                </tr>
+                <tr>
+                    <td>Evaluated At</td>
+                    <td colspan="2">{{ $admission?->evaluated_at ? \Carbon\Carbon::parse($admission->evaluated_at)->format('F d, Y') : '—' }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
     <!-- Academic Preferences -->
     <div class="section">
-        <div class="section-title">II. ACADEMIC PREFERENCES</div>
+        <div class="section-title">III. ACADEMIC PREFERENCES</div>
         <div class="grid grid-3">
             <div class="field">
                 <p class="label">Level</p>
@@ -163,28 +217,28 @@
         <div class="grid grid-3" style="margin-top: 8px;">
             <div class="field">
                 <p class="label">Strand</p>
-                <p class="value">{{ $applicant->strand ?? '—' }}</p>
+                <p class="value">{{ $applicant->strand_name ?? '—' }}</p>
             </div>
             <div class="field">
                 <p class="label">1st Program Choice</p>
-                <p class="value">{{ $applicant->first_program_choice ?? '—' }}</p>
+                <p class="value">{{ $applicant->first_program_choice_name ?? '—' }}</p>
             </div>
             <div class="field">
                 <p class="label">2nd Program Choice</p>
-                <p class="value">{{ $applicant->second_program_choice ?? '—' }}</p>
+                <p class="value">{{ $applicant->second_program_choice_name ?? '—' }}</p>
             </div>
         </div>
         <div class="grid grid-3" style="margin-top: 8px;">
             <div class="field">
                 <p class="label">3rd Program Choice</p>
-                <p class="value">{{ $applicant->third_program_choice ?? '—' }}</p>
+                <p class="value">{{ $applicant->third_program_choice_name ?? '—' }}</p>
             </div>
         </div>
     </div>
 
     <!-- Personal Information -->
     <div class="section">
-        <div class="section-title">III. PERSONAL INFORMATION</div>
+        <div class="section-title">IV. PERSONAL INFORMATION</div>
         <div class="grid grid-3">
             <div class="field">
                 <p class="label">Last Name</p>
@@ -231,7 +285,7 @@
 
     <!-- Contact Information -->
     <div class="section">
-        <div class="section-title">IV. CONTACT INFORMATION</div>
+        <div class="section-title">V. CONTACT INFORMATION</div>
         <div class="grid grid-2">
             <div class="field">
                 <p class="label">Present Address</p>
@@ -264,7 +318,7 @@
 
     <!-- Family Background -->
     <div class="section">
-        <div class="section-title">V. FAMILY BACKGROUND</div>
+        <div class="section-title">VI. FAMILY BACKGROUND</div>
         <table>
             <thead>
                 <tr>
@@ -303,7 +357,7 @@
 
     <!-- Educational Background -->
     <div class="section">
-        <div class="section-title">VI. EDUCATIONAL BACKGROUND</div>
+        <div class="section-title">VII. EDUCATIONAL BACKGROUND</div>
         <table>
             <thead>
                 <tr>

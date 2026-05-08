@@ -45,7 +45,21 @@
                         <div class="form-control col-span-4">
                             <label class="label"><span class="label-text text-gray-700 font-medium">Application No.</span></label>
                             <input type="text" readonly id="application_no" name="application_no" class="input input-bordered w-full bg-white font-mono font-bold text-green-600" placeholder="Auto-generated" value="" required>
-                            <input type="hidden" name="academic_year" value="{{ $currentAcademicYear ?? '' }}">
+                        </div>
+                        <div class="form-control col-span-4">
+                            <label class="label"><span class="label-text text-gray-700 font-medium">Academic Year</span></label>
+                            <select name="academic_year" class="select select-bordered w-full bg-white" required>
+                                <option value="">-- Select Academic Year --</option>
+                                @forelse ($academicYears as $academicYear)
+                                    <option value="{{ $academicYear->label }}" {{ old('academic_year', $currentAcademicYear ?? '') === $academicYear->label ? 'selected' : '' }}>
+                                        {{ $academicYear->label }}
+                                    </option>
+                                @empty
+                                    @if($currentAcademicYear)
+                                        <option value="{{ $currentAcademicYear }}" selected>{{ $currentAcademicYear }}</option>
+                                    @endif
+                                @endforelse
+                            </select>
                         </div>
                         <div class="form-control col-span-3">
                             <label class="label"><span class="label-text text-gray-700 font-medium">Level</span></label>
@@ -120,6 +134,7 @@
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                     <div class="border-b border-gray-200 px-6 py-3">
                         <h4 class="text-gray-800 font-semibold">Personal Information</h4>
+                        <small class="underline text-red-500">Enter N/A if not applicable.</small>
                     </div>
                     <div class="p-6 grid grid-cols-12 gap-4 mobile-col-12">
                         <div class="form-control col-span-4">
@@ -203,6 +218,7 @@
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
                     <div class="border-b border-gray-200 px-6 py-3">
                         <h4 class="text-gray-800 font-semibold">Parent/Guardian Information</h4>
+                        <small class="underline text-red-500">Enter N/A if not applicable.</small>
                     </div>
                     <div class="p-6 space-y-3">
                         <div class="hidden md:grid grid-cols-12 gap-4 pb-2 border-b border-gray-100">
@@ -275,8 +291,7 @@
                             <div class="col-span-2"><input type="text" name="college_inclusive_years" class="input input-bordered w-full bg-white input-sm" placeholder="e.g. 2027-2031" required></div>
                         </div>
                         <div class="grid grid-cols-12 gap-4 items-center mobile-col-12 rounded-lg border border-gray-100 p-3 md:border-0 md:p-0">
-                            <div class="col-span-2"><span class="text-gray-600 text-sm font-medium">LRN</span></div>
-                            <div class="col-span-10"><input type="number" name="lrn" class="input input-bordered w-full bg-white input-sm" placeholder="Learner Reference Number" value="{{ old('lrn') }}" required></div>
+
                         </div>
                     </div>
                 </div>
@@ -354,6 +369,68 @@
         const firstProgramChoiceSelect = document.getElementById('first_program_choice');
         const secondProgramChoiceSelect = document.getElementById('second_program_choice');
         const thirdProgramChoiceSelect = document.getElementById('third_program_choice');
+        const oldInput = @json(session()->getOldInput());
+        const errorFields = @json($errors->keys());
+
+        function applyOldInputValues() {
+            if (!oldInput || typeof oldInput !== 'object') {
+                return;
+            }
+
+            Object.entries(oldInput).forEach(function ([name, value]) {
+                const field = form.querySelector(`[name="${name}"]`);
+                if (!field) {
+                    return;
+                }
+
+                if (field.type === 'checkbox') {
+                    field.checked = value == field.value || value === 1 || value === '1' || value === true;
+                    return;
+                }
+
+                field.value = value ?? '';
+            });
+        }
+
+        function applyErrorStyles() {
+            if (!Array.isArray(errorFields) || errorFields.length === 0) {
+                return;
+            }
+
+            errorFields.forEach(function (name) {
+                const field = form.querySelector(`[name="${name}"]`);
+                if (!field) {
+                    return;
+                }
+
+                field.classList.add('border-red-500', 'focus:border-red-500', 'focus:ring-red-200');
+                field.setAttribute('aria-invalid', 'true');
+            });
+        }
+
+        function goToFirstStepWithError() {
+            if (!Array.isArray(errorFields) || errorFields.length === 0) {
+                return;
+            }
+
+            for (const name of errorFields) {
+                const field = form.querySelector(`[name="${name}"]`);
+                if (!field) {
+                    continue;
+                }
+
+                const parentStep = field.closest('.step-panel');
+                if (!parentStep) {
+                    continue;
+                }
+
+                const stepIndex = stepPanels.indexOf(parentStep);
+                if (stepIndex >= 0) {
+                    currentStep = stepIndex;
+                    return;
+                }
+            }
+        }
 
         function isVisible(element) {
             return !!(element.offsetWidth || element.offsetHeight || element.getClientRects().length);
@@ -444,6 +521,10 @@
                 thirdProgramChoiceSelect.parentElement.style.display = 'block';
             }
         }
+
+        applyOldInputValues();
+        applyErrorStyles();
+        goToFirstStepWithError();
 
         if (appNoField && !appNoField.value) {
             appNoField.value = generateApplicationNo();

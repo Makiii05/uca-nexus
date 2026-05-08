@@ -27,11 +27,7 @@
                     <label class="label"><span class="label-text">Status</span></label>
                     <input type="text" value="{{ ucfirst($applicant->status) }}" class="input input-bordered bg-gray-100" disabled />
                 </div>
-                <div class="form-control">
-                    <label class="label"><span class="label-text">LRN</span></label>
-                    <input type="text" name="lrn" value="{{ old('lrn', $applicant->lrn) }}" class="input input-bordered" />
-                    @error('lrn')<span class="text-error text-sm">{{ $message }}</span>@enderror
-                </div>
+
             </div>
         </div>
 

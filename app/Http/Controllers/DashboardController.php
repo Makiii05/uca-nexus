@@ -21,6 +21,30 @@ class DashboardController extends Controller
             ->get();
     }
 
+    /**
+     * Feeder school statistics for a selected academic year.
+     */
+    public static function getFeederSchoolStatistics(string $selectedYear)
+    {
+        return Applicant::select(
+                DB::raw("CASE
+                    WHEN college_school_name IS NOT NULL AND college_school_name != '' AND college_school_name != 'N/A' THEN college_school_name
+                    WHEN senior_school_name IS NOT NULL AND senior_school_name != '' AND senior_school_name != 'N/A' THEN senior_school_name
+                    WHEN junior_school_name IS NOT NULL AND junior_school_name != '' AND junior_school_name != 'N/A' THEN junior_school_name
+                    WHEN elementary_school_name IS NOT NULL AND elementary_school_name != '' AND elementary_school_name != 'N/A' THEN elementary_school_name
+                    ELSE 'Unknown'
+                END as last_school_attended"),
+                DB::raw('COUNT(*) as total_applicants'),
+                DB::raw("SUM(CASE WHEN status IN ('pending', 'interview', 'exam', 'evaluation') THEN 1 ELSE 0 END) as ongoing"),
+                DB::raw("SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as failed"),
+                DB::raw("SUM(CASE WHEN status = 'admitted' THEN 1 ELSE 0 END) as passed")
+            )
+            ->where('academic_year', $selectedYear)
+            ->groupBy('last_school_attended')
+            ->orderByDesc('total_applicants')
+            ->get();
+    }
+
     public function admissionDashboard(Request $request)
     {
         $academicYears = self::getAcademicYearOptions();
@@ -78,25 +102,7 @@ class DashboardController extends Controller
         $variance = $totalApplicants - $admittedCount;
 
         // Feeder schools filtered by academic year
-        $feederSchools = Applicant::select(
-                DB::raw("
-                    CASE
-                        WHEN college_school_name IS NOT NULL AND college_school_name != '' AND college_school_name != 'N/A' THEN college_school_name
-                        WHEN senior_school_name IS NOT NULL AND senior_school_name != '' AND senior_school_name != 'N/A' THEN senior_school_name
-                        WHEN junior_school_name IS NOT NULL AND junior_school_name != '' AND junior_school_name != 'N/A' THEN junior_school_name
-                        WHEN elementary_school_name IS NOT NULL AND elementary_school_name != '' AND elementary_school_name != 'N/A' THEN elementary_school_name
-                        ELSE 'Unknown'
-                    END as last_school_attended
-                "),
-                DB::raw("COUNT(*) as total_applicants"),
-                DB::raw("SUM(CASE WHEN status IN ('pending', 'interview', 'exam', 'evaluation') THEN 1 ELSE 0 END) as ongoing"),
-                DB::raw("SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as failed"),
-                DB::raw("SUM(CASE WHEN status = 'admitted' THEN 1 ELSE 0 END) as passed")
-            )
-            ->where('academic_year', $selectedYear)
-            ->groupBy('last_school_attended')
-            ->orderByDesc('total_applicants')
-            ->get();
+        $feederSchools = self::getFeederSchoolStatistics($selectedYear);
 
         return view('admission.dashboard', compact(
             'academicYears',

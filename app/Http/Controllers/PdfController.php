@@ -10,6 +10,7 @@ use App\Models\Schedule;
 use App\Models\SubjectOffering;
 use App\Models\AcademicTerm;
 use App\Models\Department;
+use App\Models\Program;
 use App\Models\Student;
 use App\Models\Enlistment;
 use App\Models\StudentFee;
@@ -31,44 +32,71 @@ class PdfController extends Controller
         $defaultYear = \App\Models\AcademicYear::getActiveYearLabel() ?? $academicYears->first()?->label ?? '';
         $selectedYear = $request->query('academic_year', $defaultYear);
 
-        // Group by applicants.level (e.g. "College", "Senior High", "Junior High", etc.)
-        $levelStats = Applicant::select(
-                'applicants.level as level_name',
+        $programStats = Applicant::select(
+                DB::raw("COALESCE(admissions.program_id, applicants.first_program_choice, applicants.second_program_choice, applicants.third_program_choice) as program_id"),
                 DB::raw("COUNT(DISTINCT applicants.id) as total_applicants"),
-                DB::raw("SUM(CASE WHEN admissions.interview_result IN ('passed','failed') THEN 1 ELSE 0 END) as total_interviewee"),
-                DB::raw("SUM(CASE WHEN admissions.exam_result IN ('passed','failed') THEN 1 ELSE 0 END) as total_examinee"),
-                DB::raw("SUM(CASE WHEN admissions.decision IN ('accepted','rejected') THEN 1 ELSE 0 END) as total_evaluatee"),
-                DB::raw("SUM(CASE WHEN admissions.decision = 'accepted' THEN 1 ELSE 0 END) as total_admitted")
+                DB::raw("SUM(CASE WHEN applicants.status = 'interview' THEN 1 ELSE 0 END) as total_interviewed"),
+                DB::raw("SUM(CASE WHEN applicants.status = 'exam' THEN 1 ELSE 0 END) as total_examined"),
+                DB::raw("SUM(CASE WHEN applicants.status = 'evaluation' THEN 1 ELSE 0 END) as total_evaluated"),
+                DB::raw("SUM(CASE WHEN applicants.status = 'admitted' THEN 1 ELSE 0 END) as total_admitted"),
+                DB::raw("SUM(CASE WHEN applicants.student_type = 'transferee' THEN 1 ELSE 0 END) as total_transferee")
             )
             ->leftJoin('admissions', 'applicants.id', '=', 'admissions.applicant_id')
             ->where('applicants.academic_year', $selectedYear)
-            ->groupBy('applicants.level')
-            ->orderBy('applicants.level')
+            ->groupByRaw('COALESCE(admissions.program_id, applicants.first_program_choice, applicants.second_program_choice, applicants.third_program_choice)')
+            ->orderBy('program_id')
             ->get();
+
+        $programNames = Program::whereIn('id', $programStats->pluck('program_id')->filter()->unique())
+            ->pluck('description', 'id');
 
         // Calculate grand totals
         $grandTotals = [
-            'total_applicants'  => $levelStats->sum('total_applicants'),
-            'total_interviewee' => $levelStats->sum('total_interviewee'),
-            'total_examinee'    => $levelStats->sum('total_examinee'),
-            'total_evaluatee'   => $levelStats->sum('total_evaluatee'),
-            'total_admitted'    => $levelStats->sum('total_admitted'),
+            'total_applicants'  => $programStats->sum('total_applicants'),
+            'total_interviewed' => $programStats->sum('total_interviewed'),
+            'total_examined'    => $programStats->sum('total_examined'),
+            'total_evaluated'   => $programStats->sum('total_evaluated'),
+            'total_admitted'    => $programStats->sum('total_admitted'),
+            'total_transferee'  => $programStats->sum('total_transferee'),
         ];
         $grandTotals['variance'] = $grandTotals['total_applicants'] - $grandTotals['total_admitted'];
 
-        $pdf = Pdf::loadView('pdf.print_admission_stats', compact('levelStats', 'grandTotals', 'selectedYear'));
+        $pdf = Pdf::loadView('pdf.print_admission_stats', compact('programStats', 'programNames', 'grandTotals', 'selectedYear'));
         
         return $pdf->stream('admission_stats_' . date('Y-m-d') . '.pdf');
     }
 
+    public function printFeederSchoolReport(Request $request)
+    {
+        $academicYears = DashboardController::getAcademicYearOptions();
+        $defaultYear = \App\Models\AcademicYear::getActiveYearLabel() ?? $academicYears->first()?->label ?? '';
+        $selectedYear = $request->query('academic_year', $defaultYear);
+
+        $feederSchools = DashboardController::getFeederSchoolStatistics($selectedYear);
+
+        $pdf = Pdf::loadView('pdf.print_feeder_school_report', compact('feederSchools', 'selectedYear'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->stream('feeder_school_report_' . date('Y-m-d') . '.pdf');
+    }
+
     public function printApplicantDetails($id)
     {
-        $applicants = Applicant::where('id', $id)->get();
+        $applicants = Applicant::with('admission.program')->where('id', $id)->get();
 
         $pdf = Pdf::loadView('pdf.print_applicant_details', compact('applicants'));
         
         return $pdf->stream('applicant_details_' . date('Y-m-d') . '.pdf');
         // return view('pdf.print_applicant_details', compact('applicants'));
+    }
+
+    public function printOfficialStudentDetails($id)
+    {
+        $student = Student::with(['department', 'program', 'level', 'contact', 'guardian', 'academicHistory', 'profilePicture'])->findOrFail($id);
+
+        $pdf = Pdf::loadView('pdf.print_official_student', compact('student'));
+        
+        return $pdf->stream('official_student_details_' . $student->student_number . '.pdf');
     }
 
     public function printInterviewList(Request $request)

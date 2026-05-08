@@ -139,8 +139,12 @@
 
         <!-- Feeder School Data Table -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200" data-table-wrapper>
-            <div class="px-5 py-4 border-b border-gray-200">
+            <div class="px-5 py-4 border-b border-gray-200 flex items-center justify-between gap-3">
                 <h2 class="text-lg font-medium text-gray-800">Feeder School — {{ $selectedYear }}</h2>
+                <a href="{{ route('admission.print.feeder.school', ['academic_year' => $selectedYear]) }}" target="_blank"
+                   class="inline-flex items-center gap-2 bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-lg shadow-sm transition-colors duration-200 text-sm">
+                    Feeder School Report
+                </a>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full" data-sortable-table>

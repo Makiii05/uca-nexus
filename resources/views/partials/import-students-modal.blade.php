@@ -7,7 +7,7 @@
 		<h3 class="font-bold text-lg">Import Students CSV</h3>
 		<p class="text-sm text-gray-500 mt-1 mb-4">Upload the exported students CSV file.</p>
 
-		<form action="{{ route('registrar.students.import') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+		<form action="{{ route('accounting.assessment.import') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
 			@csrf
 			<div class="form-control">
 				<label class="label">

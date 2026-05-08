@@ -111,43 +111,46 @@
     
     <div class="title">ADMISSION STATISTICS REPORT — {{ $selectedYear }}</div>
     
-    <!-- Level Breakdown -->
+    <!-- Program Breakdown -->
     <div class="section">
         <table>
             <thead>
                 <tr>
-                    <th style="width: 22%;">Level</th>
-                    <th style="width: 11%;">Applicant</th>
-                    <th style="width: 13%;">Interviewee</th>
-                    <th style="width: 11%;">Examinee</th>
-                    <th style="width: 11%;">Evaluatee</th>
-                    <th style="width: 11%;">Admitted</th>
-                    <th style="width: 11%;">Variance</th>
+                    <th style="width: 24%;">Program</th>
+                    <th style="width: 10%;">Applicant</th>
+                    <th style="width: 11%;">Interviewed</th>
+                    <th style="width: 11%;">Examined</th>
+                    <th style="width: 11%;">Evaluated</th>
+                    <th style="width: 10%;">Admitted</th>
+                    <th style="width: 10%;">Transferee</th>
+                    <th style="width: 10%;">Variance</th>
                 </tr>
             </thead>
             <tbody>
-                @forelse($levelStats as $level)
+                @forelse($programStats as $program)
                 <tr>
-                    <td>{{ $level->level_name }}</td>
-                    <td>{{ number_format($level->total_applicants) }}</td>
-                    <td>{{ number_format($level->total_interviewee) }}</td>
-                    <td>{{ number_format($level->total_examinee) }}</td>
-                    <td>{{ number_format($level->total_evaluatee) }}</td>
-                    <td>{{ number_format($level->total_admitted) }}</td>
-                    <td>{{ number_format($level->total_applicants - $level->total_admitted) }}</td>
+                    <td>{{ $programNames[$program->program_id] ?? 'Unknown' }}</td>
+                    <td>{{ number_format($program->total_applicants) }}</td>
+                    <td>{{ number_format($program->total_interviewed) }}</td>
+                    <td>{{ number_format($program->total_examined) }}</td>
+                    <td>{{ number_format($program->total_evaluated) }}</td>
+                    <td>{{ number_format($program->total_admitted) }}</td>
+                    <td>{{ number_format($program->total_transferee) }}</td>
+                    <td>{{ number_format($program->total_applicants - $program->total_admitted) }}</td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" style="text-align: center;">No level data available</td>
+                    <td colspan="8" style="text-align: center;">No program data available</td>
                 </tr>
                 @endforelse
                 <tr class="total-row">
                     <td>GRAND TOTAL</td>
                     <td>{{ number_format($grandTotals['total_applicants']) }}</td>
-                    <td>{{ number_format($grandTotals['total_interviewee']) }}</td>
-                    <td>{{ number_format($grandTotals['total_examinee']) }}</td>
-                    <td>{{ number_format($grandTotals['total_evaluatee']) }}</td>
+                    <td>{{ number_format($grandTotals['total_interviewed']) }}</td>
+                    <td>{{ number_format($grandTotals['total_examined']) }}</td>
+                    <td>{{ number_format($grandTotals['total_evaluated']) }}</td>
                     <td>{{ number_format($grandTotals['total_admitted']) }}</td>
+                    <td>{{ number_format($grandTotals['total_transferee']) }}</td>
                     <td>{{ number_format($grandTotals['variance']) }}</td>
                 </tr>
             </tbody>

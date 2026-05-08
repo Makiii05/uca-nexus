@@ -19,10 +19,7 @@
                     <span class="text-sm text-gray-500">Status</span>
                     <p id="modal_status_container"><span class="badge" id="modal_status">-</span></p>
                 </div>
-                <div>
-                    <span class="text-sm text-gray-500">LRN</span>
-                    <p class="font-medium" id="modal_lrn">-</p>
-                </div>
+
             </div>
         </div>
         
@@ -333,7 +330,7 @@
     function openApplicantModal(applicant, admission) {
         // Application Info
         document.getElementById('modal_application_no').textContent = applicant.application_no || '-';
-        document.getElementById('modal_lrn').textContent = applicant.lrn || '-';
+
         
         // Status with badge color
         const statusEl = document.getElementById('modal_status');

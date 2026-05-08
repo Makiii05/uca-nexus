@@ -15,12 +15,12 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
-class RegistrarStudentController extends Controller
+class AccountingAssessmentController extends Controller
 {
     public function showStudents()
     {
         // Don't load students on initial page load - they will be fetched via API search
-        return view('registrar.student');
+        return view('accounting.assessment');
     }
 
     public function searchStudents(Request $request)
@@ -133,9 +133,8 @@ class RegistrarStudentController extends Controller
                 $programId = $row['program_id'] ?? null;
                 $levelId = $row['level_id'] ?? null;
                 $applicationId = $row['application_id'] ?? null;
-                $lrn = $row['lrn'] ?? null;
 
-                if (!$departmentId || !$programId || !$levelId || !$applicationId || $lrn === null || $lrn === '') {
+                if (!$departmentId || !$programId || !$levelId || !$applicationId) {
                     $skipped++;
                     $invalidData++;
                     continue;
@@ -164,7 +163,6 @@ class RegistrarStudentController extends Controller
 
                 $insertData = [
                     'student_number' => $studentNumber,
-                    'lrn' => $lrn,
                     'department_id' => $departmentId,
                     'program_id' => $programId,
                     'level_id' => $levelId,
@@ -374,7 +372,7 @@ class RegistrarStudentController extends Controller
             ->orderBy('created_at')
             ->get();
 
-        return view('registrar.student_assessment', compact('student', 'levels', 'academicTerms'));
+        return view('accounting.assessment_details', compact('student', 'levels', 'academicTerms'));
     }
 
     public function getEnlistments($studentId, $academicTermId)

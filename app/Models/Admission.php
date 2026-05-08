@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Program;
 
 class Admission extends Model
 {
@@ -46,5 +47,10 @@ class Admission extends Model
     public function evaluationSchedule()
     {
         return $this->belongsTo(Schedule::class, 'evaluation_schedule_id');
+    }
+
+    public function program()
+    {
+        return $this->belongsTo(Program::class);
     }
 }

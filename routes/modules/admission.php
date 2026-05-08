@@ -58,6 +58,7 @@ Route::prefix('admission')->name('admission.')->group(function () {
         Route::post('/student/{id}/update', [StudentController::class, 'updateStudent'])->name('student.update');
         
         Route::get('/print-admission-stats', [PdfController::class, 'printAdmissionStats'])->name('print.admission.stats');
+        Route::get('/print-feeder-school-report', [PdfController::class, 'printFeederSchoolReport'])->name('print.feeder.school');
         Route::get('/print-applicant-details/{id}', [PdfController::class, 'printApplicantDetails'])->name('print.applicant.details');
         Route::get('/print-interview-list', [PdfController::class, 'printInterviewList'])->name('print.interview.list');
         Route::get('/print-exam-list', [PdfController::class, 'printExamList'])->name('print.exam.list');

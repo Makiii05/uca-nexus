@@ -12,11 +12,11 @@ use App\Http\Controllers\AcademicYearController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\PdfController;
-use App\Http\Controllers\RegistrarStudentController;
 use App\Http\Controllers\RegistrarGradeApprovalController;
 use App\Http\Controllers\RegistrarGradeReportController;
 use App\Http\Controllers\ClassListController;
 use App\Http\Controllers\EnrollmentStatusController;
+use App\Http\Controllers\RegistrarOfficialStudentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -101,23 +101,6 @@ Route::prefix('registrar')->name('registrar.')->group(function () {
         Route::get('/api/grade-report/subject-offerings', [RegistrarGradeReportController::class, 'getSubjectOfferings'])->name('api.grade_report.subject_offerings');
         Route::get('/api/grade-report/periods', [RegistrarGradeReportController::class, 'getPeriods'])->name('api.grade_report.periods');
         
-        // API routes for dynamic loading
-        Route::get('/students', [RegistrarStudentController::class, 'showStudents'])->name('student');
-        Route::get('/api/students/search', [RegistrarStudentController::class, 'searchStudents'])->name('api.students.search');
-        Route::post('/students/import', [RegistrarStudentController::class, 'importStudents'])->name('students.import');
-        Route::get('/students/{id}/assessment', [RegistrarStudentController::class, 'showAssessment'])->name('student.assessment');
-        Route::get('/students/{id}/print-assessment', [PdfController::class, 'printStudentAssessment'])->name('student.print-assessment');
-        Route::post('/students/{id}/update-level', [RegistrarStudentController::class, 'updateLevel'])->name('student.update-level');
-        Route::get('/api/enlistments/{studentId}/{academicTermId}', [RegistrarStudentController::class, 'getEnlistments'])->name('api.student.enlistments');
-        Route::get('/api/student-fees/{studentId}/{academicTermId}', [RegistrarStudentController::class, 'getStudentFees'])->name('api.student.fees');
-        Route::get('/api/existing-fees/{studentId}/{academicTermId}/{group}', [RegistrarStudentController::class, 'getExistingFees'])->name('api.existing.fees');
-        Route::post('/api/student-fees/{studentId}/create', [RegistrarStudentController::class, 'createStudentFee'])->name('api.student.fees.create');
-        Route::post('/api/student-fees/{studentId}/assign', [RegistrarStudentController::class, 'assignExistingFee'])->name('api.student.fees.assign');
-        Route::delete('/api/student-fees/{studentFeeId}', [RegistrarStudentController::class, 'removeStudentFee'])->name('api.student.fees.remove');
-
-        // Assessment history routes
-        Route::get('/api/assessment-histories/{studentId}', [RegistrarStudentController::class, 'getAssessmentHistories'])->name('api.assessment-histories');
-        Route::delete('/api/assessment-histories/{id}', [RegistrarStudentController::class, 'deleteAssessmentHistory'])->name('api.assessment-histories.delete');
 
         Route::get('/api/levels-by-department/{departmentId}', [ProspectusController::class, 'getLevelsByDepartment'])->name('api.levels');
         Route::get('/api/curricula-by-department/{departmentId}', [ProspectusController::class, 'getCurriculaByDepartment'])->name('api.curricula');
@@ -132,5 +115,14 @@ Route::prefix('registrar')->name('registrar.')->group(function () {
         // Enrollment Status API
         Route::post('/api/enrollment-status/toggle', [EnrollmentStatusController::class, 'toggle'])->name('api.enrollment-status.toggle');
         Route::get('/api/enrollment-status', [EnrollmentStatusController::class, 'status'])->name('api.enrollment-status');
+
+        // Official Students
+        Route::get('/official-students', [RegistrarOfficialStudentController::class, 'index'])->name('official_students');
+        Route::get('/official-students/{id}/edit', [RegistrarOfficialStudentController::class, 'edit'])->name('official_students.edit');
+        Route::post('/official-students/{id}/update', [RegistrarOfficialStudentController::class, 'update'])->name('official_students.update');
+        Route::post('/official-students/{id}/profile-picture', [RegistrarOfficialStudentController::class, 'uploadProfilePicture'])->name('official_students.upload_pfp');
+        Route::delete('/official-students/{id}/profile-picture', [RegistrarOfficialStudentController::class, 'deleteProfilePicture'])->name('official_students.delete_pfp');
+        Route::get('/api/official-students/search', [RegistrarOfficialStudentController::class, 'search'])->name('api.official_students.search');
+        Route::get('/print-official-student/{id}', [PdfController::class, 'printOfficialStudentDetails'])->name('print.official_student');
     });
 });

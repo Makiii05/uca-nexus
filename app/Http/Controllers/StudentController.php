@@ -423,7 +423,6 @@ class StudentController extends Controller
             // Create the student record
             $student = Student::create([
                 'student_number' => $studentNumber,
-                'lrn' => $applicant->lrn,
                 'department_id' => $departmentId,
                 'program_id' => $program->id,
                 'level_id' => $level->id,

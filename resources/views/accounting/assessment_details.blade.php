@@ -1,9 +1,9 @@
-<x-registrar_sidebar>
+<x-accounting_sidebar>
 
     @include('partials.notifications')
 
     <div class="flex items-center gap-4 mb-4">
-        <a href="{{ route('registrar.student') }}" class="btn btn-ghost btn-sm">
+        <a href="{{ route('accounting.assessment') }}" class="btn btn-ghost btn-sm">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
             Back
         </a>
@@ -321,15 +321,15 @@
 
     <script>
         const studentId = {{ $student->id }};
-        const enlistmentsApiUrl = '{{ url("/registrar/api/enlistments") }}';
-        const studentFeesApiUrl = '{{ url("/registrar/api/student-fees") }}';
-        const existingFeesApiUrl = '{{ url("/registrar/api/existing-fees") }}';
-        const createFeeApiUrl = '{{ url("/registrar/api/student-fees") }}/' + studentId + '/create';
-        const assignFeeApiUrl = '{{ url("/registrar/api/student-fees") }}/' + studentId + '/assign';
-        const removeFeeApiUrl = '{{ url("/registrar/api/student-fees") }}';
-        const assessmentHistoriesApiUrl = '{{ url("/registrar/api/assessment-histories") }}';
+        const enlistmentsApiUrl = '{{ url("/accounting/api/assessments/enlistments") }}';
+        const studentFeesApiUrl = '{{ url("/accounting/api/assessments/student-fees") }}';
+        const existingFeesApiUrl = '{{ url("/accounting/api/assessments/existing-fees") }}';
+        const createFeeApiUrl = '{{ url("/accounting/api/assessments/student-fees") }}/' + studentId + '/create';
+        const assignFeeApiUrl = '{{ url("/accounting/api/assessments/student-fees") }}/' + studentId + '/assign';
+        const removeFeeApiUrl = '{{ url("/accounting/api/assessments/student-fees") }}';
+        const assessmentHistoriesApiUrl = '{{ url("/accounting/api/assessments/assessment-histories") }}';
         const csrfToken = '{{ csrf_token() }}';
-        const printBaseUrl = '{{ route('registrar.student.print-assessment', $student->id) }}';
+        const printBaseUrl = '{{ route('accounting.assessment.print-assessment', $student->id) }}';
 
         function getSelectedTermId() {
             return document.getElementById('academicTermSelect').value;
@@ -825,7 +825,7 @@
             messageEl.textContent = '';
 
             try {
-                const response = await fetch(`{{ route('registrar.student.update-level', $student->id) }}`, {
+                const response = await fetch(`{{ route('accounting.assessment.update-level', $student->id) }}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -922,4 +922,4 @@
 
     </script>
 
-</x-registrar_sidebar>
+</x-accounting_sidebar>

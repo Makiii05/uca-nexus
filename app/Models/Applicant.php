@@ -55,7 +55,6 @@ class Applicant extends Model
         "college_school_name",
         "college_school_address",
         "college_inclusive_years",
-        "lrn",
         "status",
         "reject_reason",
         "academic_year",
@@ -75,33 +74,45 @@ class Applicant extends Model
         return $this->hasOne(Admission::class);
     }
 
-    // ── Accessors: resolve program IDs to readable names ──
+    public function strandProgram()
+    {
+        return $this->belongsTo(Program::class, 'strand');
+    }
+
+    public function firstProgramChoice()
+    {
+        return $this->belongsTo(Program::class, 'first_program_choice');
+    }
+
+    public function secondProgramChoice()
+    {
+        return $this->belongsTo(Program::class, 'second_program_choice');
+    }
+
+    public function thirdProgramChoice()
+    {
+        return $this->belongsTo(Program::class, 'third_program_choice');
+    }
+
+    // ── Accessors: resolve program relationships to readable names ──
 
     public function getStrandNameAttribute(): ?string
     {
-        if (!$this->strand) return null;
-        $program = Program::find($this->strand);
-        return $program ? "{$program->description}" : null;
+        return $this->strandProgram?->description;
     }
 
     public function getFirstProgramChoiceNameAttribute(): ?string
     {
-        if (!$this->first_program_choice) return null;
-        $program = Program::find($this->first_program_choice);
-        return $program ? "{$program->description}" : null;
+        return $this->firstProgramChoice?->description;
     }
 
     public function getSecondProgramChoiceNameAttribute(): ?string
     {
-        if (!$this->second_program_choice) return null;
-        $program = Program::find($this->second_program_choice);
-        return $program ? "{$program->description}" : null;
+        return $this->secondProgramChoice?->description;
     }
 
     public function getThirdProgramChoiceNameAttribute(): ?string
     {
-        if (!$this->third_program_choice) return null;
-        $program = Program::find($this->third_program_choice);
-        return $program ? "{$program->description}" : null;
+        return $this->thirdProgramChoice?->description;
     }
 }

@@ -86,4 +86,9 @@ class Student extends Model
     {
         return $this->hasOne(StudentAccount::class);
     }
+
+    public function profilePicture(): HasOne
+    {
+        return $this->hasOne(StudentProfilePicture::class);
+    }
 }

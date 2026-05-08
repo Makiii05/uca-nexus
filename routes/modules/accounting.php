@@ -7,6 +7,7 @@ use App\Http\Controllers\CashierController;
 use App\Http\Controllers\PaymentDetailsController;
 use App\Http\Controllers\PdfController;
 use App\Http\Controllers\StudentPortalStatusController;
+use App\Http\Controllers\AccountingAssessmentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +26,24 @@ Route::prefix('accounting')->name('accounting.')->group(function () {
         // Dashboard
         Route::get('/dashboard', [AccountingAuthController::class, 'showDashboard'])->name('dashboard');
         
+        // Assessments
+        Route::get('/assessments', [AccountingAssessmentController::class, 'showStudents'])->name('assessment');
+        Route::get('/api/assessments/search', [AccountingAssessmentController::class, 'searchStudents'])->name('api.assessment.search');
+        Route::post('/assessments/import', [AccountingAssessmentController::class, 'importStudents'])->name('assessment.import');
+        Route::get('/assessments/{id}/details', [AccountingAssessmentController::class, 'showAssessment'])->name('assessment.details');
+        Route::get('/assessments/{id}/print-assessment', [PdfController::class, 'printStudentAssessment'])->name('assessment.print-assessment');
+        Route::post('/assessments/{id}/update-level', [AccountingAssessmentController::class, 'updateLevel'])->name('assessment.update-level');
+        Route::get('/api/assessments/enlistments/{studentId}/{academicTermId}', [AccountingAssessmentController::class, 'getEnlistments'])->name('api.assessment.enlistments');
+        Route::get('/api/assessments/student-fees/{studentId}/{academicTermId}', [AccountingAssessmentController::class, 'getStudentFees'])->name('api.assessment.fees');
+        Route::get('/api/assessments/existing-fees/{studentId}/{academicTermId}/{group}', [AccountingAssessmentController::class, 'getExistingFees'])->name('api.assessment.existing.fees');
+        Route::post('/api/assessments/student-fees/{studentId}/create', [AccountingAssessmentController::class, 'createStudentFee'])->name('api.assessment.fees.create');
+        Route::post('/api/assessments/student-fees/{studentId}/assign', [AccountingAssessmentController::class, 'assignExistingFee'])->name('api.assessment.fees.assign');
+        Route::delete('/api/assessments/student-fees/{studentFeeId}', [AccountingAssessmentController::class, 'removeStudentFee'])->name('api.assessment.fees.remove');
+
+        // Assessment history routes
+        Route::get('/api/assessments/assessment-histories/{studentId}', [AccountingAssessmentController::class, 'getAssessmentHistories'])->name('api.assessment.assessment-histories');
+        Route::delete('/api/assessments/assessment-histories/{id}', [AccountingAssessmentController::class, 'deleteAssessmentHistory'])->name('api.assessment.assessment-histories.delete');
+
         // Student Portal Status API
         Route::post('/api/student-portal-status/toggle', [StudentPortalStatusController::class, 'toggle'])->name('api.student-portal-status.toggle');
         Route::get('/api/student-portal-status', [StudentPortalStatusController::class, 'status'])->name('api.student-portal-status');
