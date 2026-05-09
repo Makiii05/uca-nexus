@@ -64,6 +64,13 @@ Route::prefix('registrar')->name('registrar.')->group(function () {
         Route::post('/subjects/{id}/update', [SubjectController::class, 'updateSubject'])->name('subject.update');
         Route::post('/subjects/{id}/delete', [SubjectController::class, 'deleteSubject'])->name('subject.delete');
 
+        // Subject Fee API routes
+        Route::get('/api/subjects/{id}/fees', [SubjectController::class, 'getSubjectFees'])->name('api.subject.fees');
+        Route::get('/api/subjects/academic-terms', [SubjectController::class, 'getAcademicTermsByProgram'])->name('api.subject.academic-terms');
+        Route::get('/api/subjects/fees-by-term', [SubjectController::class, 'getFeesByTerm'])->name('api.subject.fees-by-term');
+        Route::post('/api/subjects/{id}/fees', [SubjectController::class, 'addSubjectFee'])->name('api.subject.fees.add');
+        Route::delete('/api/subjects/fees/{subjectFeeId}', [SubjectController::class, 'removeSubjectFee'])->name('api.subject.fees.remove');
+
         Route::get('/levels', [LevelController::class, 'showLevel'])->name('level');
         Route::post('/levels', [LevelController::class, 'createLevel'])->name('level.create');
         Route::post('/levels/{id}/update', [LevelController::class, 'updateLevel'])->name('level.update');

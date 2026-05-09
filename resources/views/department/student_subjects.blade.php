@@ -13,7 +13,8 @@
     <div class="mb-4 text-lg gap-1">
         <p><strong>Student No.: </strong>{{ $student->student_number}}</p>
         <p><strong>Name: </strong>{{ $student->last_name }}, {{ $student->first_name }} {{ $student->middle_name }}</p>
-        <p><strong>School Year: </strong>{{ $academicTerm->description }}</p>
+        <p><strong>Academic Term: </strong>{{ $academicTerm->description }}</p>
+        <p><strong>Type: </strong>{{ ucfirst($student->student_type) }}</p>
         <div class="flex items-center gap-2 mt-2">
             <select name="level" id="level" class="select select-bordered select-sm">
                 @if (isset($levels))
@@ -107,6 +108,7 @@
     const studentId = {{ $student->id }};
     const academicTermId = {{ $academicTerm->id }};
     const csrfToken = '{{ csrf_token() }}';
+    let hasTransactions = {{ $hasTransactions ? 'true' : 'false' }};
 
     // Update status and level
     document.getElementById('submitUpdate').addEventListener('click', function(event) {
@@ -143,6 +145,9 @@
             .then(response => response.json())
             .then(data => {
                 const tbody = document.getElementById('enlistmentTable');
+                if (data.has_transactions !== undefined) {
+                    hasTransactions = data.has_transactions;
+                }
                 if (data.success && data.data.length > 0) {
                     tbody.innerHTML = data.data.map(item => `
                         <tr>
@@ -151,7 +156,7 @@
                             <td>${item.subject_description}</td>
                             <td>${item.final_grade || '-'}</td>
                             <td>
-                                <button class="text-red-600 hover:underline text-sm" onclick="removeEnlistment(${item.id})">remove</button>
+                                ${!hasTransactions ? `<button class="text-red-600 hover:underline text-sm" onclick="removeEnlistment(${item.id})">remove</button>` : ''}
                             </td>
                         </tr>
                     `).join('');

@@ -16,11 +16,14 @@ class Subject extends Model
         "labu",
         "type",
         "education_level",
-        "weight_category",
         "status",
     ];
 
     public function prospectuses(){
         return $this->hasMany(Prospectus::class);
+    }
+
+    public function subjectFees(){
+        return $this->hasMany(SubjectFee::class);
     }
 }

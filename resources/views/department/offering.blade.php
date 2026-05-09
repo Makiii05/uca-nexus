@@ -33,14 +33,12 @@
                         @if(isset($academicTerm))
                         <input type="hidden" name="academic_term_id" value="{{ $academicTerm->id }}" />
                         @endif
-                        <select name="department" id="departmentSelect" class="select select-bordered select-sm" required>
-                            <option value="">--Select Department--</option>
-                            @foreach ($departments as $department)
-                            <option value="{{ $department->id }}" @if(isset($old_department) && $old_department == $department->id) selected @endif>{{ $department->description }}</option>
-                            @endforeach
-                        </select>
+                        <span class="text-sm font-semibold px-3 py-1 bg-base-200 rounded">{{ $department->description ?? 'N/A' }}</span>
                         <select name="curriculum" id="curriculumSelect" class="select select-bordered select-sm" required>
                             <option value="">--Select Curriculum--</option>
+                            @foreach ($curricula as $curriculum)
+                            <option value="{{ $curriculum->id }}" @if(isset($old_curriculum) && $old_curriculum == $curriculum->id) selected @endif>{{ $curriculum->curriculum }}</option>
+                            @endforeach
                         </select>
                         <button type="submit" class="btn btn-sm btn-neutral">Search</button>
                     </form>
@@ -547,22 +545,7 @@
         }
     }
 
-    // Department change -> load curricula
-    document.getElementById('departmentSelect').addEventListener('change', function() {
-        const curriculumSelect = document.getElementById('curriculumSelect');
-        loadCurriculaByDepartment(this.value, curriculumSelect);
-    });
-
-    // On page load, if department is pre-selected (after search), load its curricula
-    document.addEventListener('DOMContentLoaded', function() {
-        const departmentSelect = document.getElementById('departmentSelect');
-        const curriculumSelect = document.getElementById('curriculumSelect');
-
-        if (departmentSelect.value) {
-            const oldCurriculum = '{{ $old_curriculum ?? '' }}';
-            loadCurriculaByDepartment(departmentSelect.value, curriculumSelect, oldCurriculum || null);
-        }
-    });
+    // Curricula are now rendered server-side, no need for dynamic loading
 
     // Subject search with debounce
     let searchTimeout = null;

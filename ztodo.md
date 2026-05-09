@@ -9,25 +9,27 @@ Use this section for new pages, modules, reports, buttons, or other features tha
 
 ## Objective
 
-- to copy a feature/function from one module to another. then add a few tweaks or modifications to the copied feature/function.
+- create a seeder, but no need to execute
+- make changes on subject offering view when searching by prospectus 
+- add coulm on student table
+- changing studnet_type [old, new] in student table
 
 ---
 
 ## Expected Outcome
 
-- copy the admission.official_students to registrar. name the copied official students to "official students" too.
-- the copied feature have no import button.
-- the copied feature has only the following action: view details, print, edit
-- in view detail include the following info: Academic, Personal, COntact, family BG, Educational BG
-- in view detail include too the profile picture of student on upper right. if no profile picture, show the add profile picture button. if with profile picture, show the profile picture. inline with that, create new FK table for profile picture of each student and call it student.profile_picture. the profile picture table include FK student_id and the uniqid() as the filename and the file itself stored in the assets folder. so when saving the pfp in local storage assets, it would save like : \assets\images\profile_picture\ {uniqid()}.jpg and display it in the view details modal at upper right. also, add change and delete pfp under the profile picture in view details modal. and when do delete, delete too in the asset. and when edditing, just replace the old file with new file in the same folder with the same id.
-- the printing includes the pfp, placeholder if no pfp, in the upper right, below the header info.
-- do not remove the official student in admssion
-
+- create a seeder based on the data on .Databases\website.sql
+- instead of just shosing a list of department in subject offering view -> search by prospectus -> dropdown of departments, only show the department that is currently logged in. that way, they dont have to select its own department, then show the active curriculumn under it instead of calling them APi, since the college dropdown is automatically selectedf the current department logged in.
+- create new column called 'academic_year_admitted' in student table 
+- when student is admitted, the academic_year_admitted data is based on the application academic year
+- Student Type:
+    -- all new admitted student are 'new' (implemented already)
+    -- if subject is assigned to the student iin elistment, check if the student type is old, if old then proceed, if new, check if the student has a entry in student_subject with different academic term. that means that the student already enrolled in the previous academic term, so the student is now 'old'. if the student has no entry in student_subject with different academic term, then the student is still 'new' if the student type is already old, then proceed. 
 ---
 
-## Additional Todo
+## Additional Todo/Revision
 
-- 
+- if the student already has a downpayment, it cant delete a subject (done). but also make that the department cant add new subject. so disabbled the add button if the student already has a downpayment. and make a label, "Downpayment is already paid, cant add/delete subject".
 
 ---
 

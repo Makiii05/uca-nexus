@@ -28,6 +28,7 @@ class Student extends Model
         'application_id',
         'status',
         'student_type',
+        'academic_year_admitted',
         'is_exported',
     ];
 

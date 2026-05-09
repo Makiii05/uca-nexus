@@ -8,6 +8,9 @@ use App\Models\Level;
 use App\Models\AcademicTerm;
 use App\Models\Enlistment;
 use App\Models\SubjectOffering;
+use App\Models\SubjectFee;
+use App\Models\StudentFee;
+use App\Models\Transaction;
 
 class EnlistmentController extends Controller
 {
@@ -33,7 +36,12 @@ class EnlistmentController extends Controller
         $academicTerm = AcademicTerm::where('id', $academic_term_id)->first();
         $levels = Level::where('program_id', $student->program_id)->orderBy('order')->get();
 
-        return view('department.student_subjects', compact('student', 'academicTerm', 'levels'));
+        // Check if student has any transactions for this academic term
+        $hasTransactions = Transaction::where('student_id', $id)
+            ->where('academic_term_id', $academic_term_id)
+            ->exists();
+
+        return view('department.student_subjects', compact('student', 'academicTerm', 'levels', 'hasTransactions'));
     }
 
     public function updateStudentEnlistmentApi(Request $request, $id)
@@ -137,8 +145,14 @@ class EnlistmentController extends Controller
             ->where('academic_term_id', $academicTermId)
             ->get();
 
+        // Check if student has transactions for this term
+        $hasTransactions = Transaction::where('student_id', $studentId)
+            ->where('academic_term_id', $academicTermId)
+            ->exists();
+
         return response()->json([
             'success' => true,
+            'has_transactions' => $hasTransactions,
             'data' => $enlistments->map(function ($enlistment) {
                 return [
                     'id' => $enlistment->id,
@@ -161,6 +175,18 @@ class EnlistmentController extends Controller
             'subject_offering_id' => 'required|exists:subject_offerings,id',
         ]);
 
+        // Block adding if student already has a downpayment (transaction) for this term
+        $hasTransactions = Transaction::where('student_id', $validated['student_id'])
+            ->where('academic_term_id', $validated['academic_term_id'])
+            ->exists();
+
+        if ($hasTransactions) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Downpayment is already paid, cannot add/delete subject.',
+            ], 400);
+        }
+
         $exists = Enlistment::where('student_id', $validated['student_id'])
             ->where('academic_term_id', $validated['academic_term_id'])
             ->where('subject_offering_id', $validated['subject_offering_id'])
@@ -175,6 +201,19 @@ class EnlistmentController extends Controller
 
         Enlistment::create($validated);
 
+        // Auto-add subject fees to student_fees
+        $subjectOffering = SubjectOffering::find($validated['subject_offering_id']);
+        if ($subjectOffering) {
+            $this->addSubjectFeesToStudent(
+                $validated['student_id'],
+                $subjectOffering->subject_id,
+                $validated['academic_term_id']
+            );
+        }
+
+        // Auto-update student_type from 'new' to 'old' if student has enlistments in a different term
+        $this->updateStudentTypeIfNeeded($validated['student_id'], $validated['academic_term_id']);
+
         return response()->json([
             'success' => true,
             'message' => 'Subject added successfully.',
@@ -188,6 +227,18 @@ class EnlistmentController extends Controller
             'academic_term_id' => 'required|exists:academic_terms,id',
             'section_code' => 'required|string',
         ]);
+
+        // Block adding if student already has a downpayment (transaction) for this term
+        $hasTransactions = Transaction::where('student_id', $validated['student_id'])
+            ->where('academic_term_id', $validated['academic_term_id'])
+            ->exists();
+
+        if ($hasTransactions) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Downpayment is already paid, cannot add/delete subject.',
+            ], 400);
+        }
 
         $user = auth()->user();
         $departmentId = $user->department_id;
@@ -217,10 +268,23 @@ class EnlistmentController extends Controller
                     'academic_term_id' => $validated['academic_term_id'],
                     'subject_offering_id' => $offering->id,
                 ]);
+
+                // Auto-add subject fees to student_fees
+                $this->addSubjectFeesToStudent(
+                    $validated['student_id'],
+                    $offering->subject_id,
+                    $validated['academic_term_id']
+                );
+
                 $added++;
             } else {
                 $skipped++;
             }
+        }
+
+        // Auto-update student_type from 'new' to 'old' if student has enlistments in a different term
+        if ($added > 0) {
+            $this->updateStudentTypeIfNeeded($validated['student_id'], $validated['academic_term_id']);
         }
 
         return response()->json([
@@ -231,12 +295,87 @@ class EnlistmentController extends Controller
 
     public function removeEnlistmentApi(Request $request, $id)
     {
-        $enlistment = Enlistment::findOrFail($id);
+        $enlistment = Enlistment::with('subjectOffering')->findOrFail($id);
+
+        // Auto-remove subject fees from student_fees
+        if ($enlistment->subjectOffering) {
+            $this->removeSubjectFeesFromStudent(
+                $enlistment->student_id,
+                $enlistment->subjectOffering->subject_id,
+                $enlistment->academic_term_id
+            );
+        }
+
         $enlistment->delete();
 
         return response()->json([
             'success' => true,
             'message' => 'Subject removed successfully.',
         ]);
+    }
+
+    /**
+     * Add subject fees to student_fees table.
+     * For each fee linked to the subject via subject_fees,
+     * create a student_fee entry if it doesn't already exist.
+     */
+    private function addSubjectFeesToStudent($studentId, $subjectId, $academicTermId)
+    {
+        $subjectFees = SubjectFee::where('subject_id', $subjectId)->get();
+
+        foreach ($subjectFees as $subjectFee) {
+            $exists = StudentFee::where('student_id', $studentId)
+                ->where('fee_id', $subjectFee->fee_id)
+                ->where('academic_term_id', $academicTermId)
+                ->exists();
+
+            if (!$exists) {
+                StudentFee::create([
+                    'student_id' => $studentId,
+                    'fee_id' => $subjectFee->fee_id,
+                    'academic_term_id' => $academicTermId,
+                ]);
+            }
+        }
+    }
+
+    /**
+     * Remove subject fees from student_fees table.
+     * For each fee linked to the subject via subject_fees,
+     * delete the corresponding student_fee entry.
+     */
+    private function removeSubjectFeesFromStudent($studentId, $subjectId, $academicTermId)
+    {
+        $subjectFees = SubjectFee::where('subject_id', $subjectId)->get();
+
+        foreach ($subjectFees as $subjectFee) {
+            StudentFee::where('student_id', $studentId)
+                ->where('fee_id', $subjectFee->fee_id)
+                ->where('academic_term_id', $academicTermId)
+                ->delete();
+        }
+    }
+
+    /**
+     * Update student_type from 'new' to 'old' if the student has
+     * enlistment entries in a different academic term.
+     */
+    private function updateStudentTypeIfNeeded($studentId, $currentAcademicTermId)
+    {
+        $student = Student::find($studentId);
+
+        if (!$student || $student->student_type === 'old') {
+            return; // Already 'old', nothing to do
+        }
+
+        // Check if student has enlistments in a DIFFERENT academic term
+        $hasPriorEnlistments = Enlistment::where('student_id', $studentId)
+            ->where('academic_term_id', '!=', $currentAcademicTermId)
+            ->exists();
+
+        if ($hasPriorEnlistments) {
+            $student->student_type = 'old';
+            $student->save();
+        }
     }
 }

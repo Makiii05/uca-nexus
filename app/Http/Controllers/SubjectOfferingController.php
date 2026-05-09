@@ -23,7 +23,14 @@ class SubjectOfferingController extends Controller
         $academicTermId = $request->query('academic_term_id');
         $academicTerm = $academicTermId ? AcademicTerm::find($academicTermId) : null;
 
-        $departments = Department::where('status', 'active')->orderBy('created_at', 'asc')->get();
+        // Only pass the logged-in user's department (auto-selected)
+        $department = Department::find($departmentId);
+
+        // Pre-load active curricula for the user's department
+        $curricula = Curriculum::where('department_id', $departmentId)
+            ->where('status', 'active')
+            ->orderBy('created_at', 'asc')
+            ->get();
 
         $programs = Program::where('department_id', $departmentId)
             ->where('status', 'active')
@@ -44,7 +51,8 @@ class SubjectOfferingController extends Controller
         }
 
         return view('department.offering', [
-            'departments' => $departments,
+            'department' => $department,
+            'curricula' => $curricula,
             'programs' => $programs,
             'academicTerm' => $academicTerm,
             'subjectOfferings' => $subjectOfferings,
@@ -58,26 +66,31 @@ class SubjectOfferingController extends Controller
         $departmentId = $request->user()->department_id;
 
         $validated = $request->validate([
-            'department' => 'required|string|max:255',
             'curriculum' => 'required|exists:curricula,id',
             'academic_term_id' => 'nullable|exists:academic_terms,id',
         ]);
 
-        $selectedDepartment = $validated['department'];
         $curriculum_id = $validated['curriculum'];
         $academicTermId = $validated['academic_term_id'] ?? null;
         $academicTerm = $academicTermId ? AcademicTerm::find($academicTermId) : null;
 
         $prospectuses = Prospectus::where('status', 'active')
             ->where('curriculum_id', $curriculum_id)
-            ->whereHas('curriculum', function ($query) use ($selectedDepartment) {
-                $query->where('department_id', $selectedDepartment);
+            ->whereHas('curriculum', function ($query) use ($departmentId) {
+                $query->where('department_id', $departmentId);
             })
             ->with(['curriculum.department', 'level.program', 'subject', 'term'])
             ->orderBy('created_at', 'asc')
             ->get();
 
-        $departments = Department::where('status', 'active')->orderBy('created_at', 'asc')->get();
+        // Only pass the logged-in user's department (auto-selected)
+        $department = Department::find($departmentId);
+
+        // Pre-load active curricula for the user's department
+        $curricula = Curriculum::where('department_id', $departmentId)
+            ->where('status', 'active')
+            ->orderBy('created_at', 'asc')
+            ->get();
 
         $programs = Program::where('department_id', $departmentId)
             ->where('status', 'active')
@@ -99,9 +112,9 @@ class SubjectOfferingController extends Controller
 
         return view('department.offering', [
             'prospectuses' => $prospectuses,
-            'departments' => $departments,
+            'department' => $department,
+            'curricula' => $curricula,
             'programs' => $programs,
-            'old_department' => $selectedDepartment,
             'old_curriculum' => $curriculum_id,
             'academicTerm' => $academicTerm,
             'subjectOfferings' => $subjectOfferings,

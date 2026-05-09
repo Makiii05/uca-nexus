@@ -437,6 +437,7 @@ class StudentController extends Controller
                 'civil_status' => $applicant->civil_status,
                 'application_id' => $applicant->id,
                 'status' => 'enrolled',
+                'academic_year_admitted' => $applicant->academic_year,
             ]);
 
             // Create student contact
